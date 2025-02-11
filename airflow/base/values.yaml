@@ -1,8 +1,10 @@
 useStandardNaming: true
 
-defaultAirflowRepository: joycedio/ipea
+defaultAirflowRepository: registry.gitlab.com/lappis-unb/gest-odadosipea/app-lappis-ipea/airflow-ipea
 defaultAirflowTag: "latest"
-airflowVersion: "2.10.3"
+airflowVersion: "2.8.1"
+
+
 
 executor: "CeleryKubernetesExecutor"
 
@@ -86,15 +88,15 @@ extraEnv: |
   - name: AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE
     value: America/Sao_Paulo
   - name: AIRFLOW__WEBSERVER__NAVBAR_COLOR
-    value: "#FFD700"
+    value: "#FFCBDB"
   # TODO: always remember to sync with `run-airflow-migrations-job-patch.yaml` and `create-user-job-patch.yaml`
   - name: PYTHONPATH
-    value: "/usr/local/lib/python312.zip:/usr/local/lib/python3.12:/usr/local/lib/python3.12/lib-dynload:/home/airflow/.local/lib/python3.12/site-packages:/opt/airflow/dags-config/repo:/opt/airflow/dags-config/repo/plugins:/opt/airflow/dags:/opt/airflow/config"
+    value: "/usr/local/lib/python312.zip:/usr/local/lib/python3.12:/usr/local/lib/python3.12/lib-dynload:/home/airflow/.local/lib/python3.12/site-packages:/opt/airflow/dags-config/repo:/opt/airflow/dags-config/repo/airflow_lappis/plugins:/opt/airflow/dags-config/repo/airflow_lappis/dags:/opt/airflow/dags-config/repo/airflow_lappis/config:/home/airflow/.local/bin/airflow:/home/airflow/.local/bin:/opt/airflow/dags-config/repo/airflow_lappis/helpers"
 
   - name: AIRFLOW__CORE__PLUGINS_FOLDER
-    value: /opt/airflow/dags-config/repo/plugins
+    value: /opt/airflow/dags-config/repo/airflow_lappis/plugins
   - name: AIRFLOW__CORE__DAGS_FOLDER
-    value: /opt/airflow/dags-config/repo/dags
+    value: /opt/airflow/dags-config/repo/airflow_lappis/dags
 
 # Airflow database & redis config
 data:
@@ -261,12 +263,12 @@ dags:
     enabled: false
   gitSync:
     enabled: true
-    repo: https://gitlab.com/lappis-unb/gest-odadosipea/data-mapping
+    repo: https://gitlab.com/lappis-unb/gest-odadosipea/app-lappis-ipea
     depth: 2
     # the number of consecutive failures allowed before aborting
     maxFailures: 0
     # subpath within the repo where dags are located
     # should be "" if dags are at repo root
-    subPath: "dags"
+    subPath: "airflow_lappis/dags"
     # Git credentials
     credentialsSecret: airflow-git-credentials
