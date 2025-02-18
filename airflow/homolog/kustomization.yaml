@@ -52,6 +52,12 @@ helmCharts:
         # # The git revision (branch, tag, or hash) to check out, v4 only
         # ref: v2-2-stable
 
+patches:
+- path: ../base/create-user-job-patch.yaml
+  target:
+    kind: Job
+    labelSelector: component=create-user-job
+
 resources:
   - ../base
   - airflow-web-issuer.yaml

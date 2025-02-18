@@ -1,0 +1,32 @@
+replicaCount: 2
+
+service:
+  type: NodePort
+  port: 8088
+  nodePort:
+    http: null
+
+resources:
+  limits:
+    cpu: 1
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+extraEnvRaw:
+  - name: SUPERSET_SECRET_KEY
+    valueFrom:
+      secretKeyRef:
+        name: superset-secret-key
+        key: SUPERSET_SECRET_KEY
+
+envFromSecret: custom-superset-env
+secretEnv:
+  create: false
+
+postgresql:
+  enabled: false
+
+redis:
+  enabled: true
