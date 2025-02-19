@@ -12,6 +12,9 @@ helmCharts:
     singleuser:
       storage:
         capacity: 10Gi
+        type: dynamic
+        dynamic:
+          storageClass: storage-jupyter-custom
     hub:
       extraVolumes:
         - name: cert-volume
@@ -24,3 +27,4 @@ helmCharts:
 
 resources:
 - shared-storage-pvc.yaml
+- storage-jupyter-custom.yaml
