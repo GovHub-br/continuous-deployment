@@ -1,18 +1,12 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: storage-jupyter-custom
+  name: longhorn-rwo
 provisioner: driver.longhorn.io
 parameters:
   numberOfReplicas: "3"
   staleReplicaTimeout: "30"
   fsType: "ext4"
-  dataLocality: "disabled"
-mountOptions:
-  - "vers=4.1"
-  - "noresvport"
-  - "timeo=600"
-  - "retrans=5"
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
 allowVolumeExpansion: true

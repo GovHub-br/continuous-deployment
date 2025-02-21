@@ -11,20 +11,18 @@ helmCharts:
   valuesInline:
     singleuser:
       storage:
-        capacity: 10Gi
-        type: dynamic
         dynamic:
-          storageClass: storage-jupyter-custom
-    hub:
-      extraVolumes:
-        - name: cert-volume
-          secret:
-            secretName: extrator-ipea-certificate
-      extraVolumeMounts:
-        - name: cert-volume
-          mountPath: "/etc/tls/certs"
-          readOnly: true
+          storageAccessModes: [ReadWriteOnce]
+          storageClass: longhorn-rwo
+        extraVolumes:
+          - name: cert-volume
+            secret:
+              secretName: extrator-ipea-certificate
+        extraVolumeMounts:
+          - name: cert-volume
+            mountPath: "/etc/tls/certs"
+            readOnly: true
 
 resources:
 - shared-storage-pvc.yaml
-- storage-jupyter-custom.yaml
+- longhorn-rwo.yaml
