@@ -97,6 +97,8 @@ extraEnv: |
     value: /opt/airflow/dags-config/repo/airflow_lappis/plugins
   - name: AIRFLOW__CORE__DAGS_FOLDER
     value: /opt/airflow/dags-config/repo/airflow_lappis/dags
+  - name: AIRFLOW_REPO_BASE
+    value: /opt/airflow/dags-config/repo/airflow_lappis
 
 # Airflow database & redis config
 data:
