@@ -1,6 +1,7 @@
 global:
   helmDefault: false
-  valuesFile: values.yaml
+  defaultValueFiles:
+    - values.yaml
   spec:
     project: default
     destination:
@@ -73,6 +74,13 @@ argocdApplications:
     path: minio
     targetRevision: HEAD
     helm: true
+
+  jupyterhub:
+    name: jupyterhub
+    namespace: jupyterhub
+    disableAutomated: false
+    disable: false
+    path: jupyterhub/homolog
 
   # TODO: adicionar instalacoes q precisam de kustomize (airflow, jupyterhub, kube-vip)
 

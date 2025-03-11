@@ -1,4 +1,3 @@
-
 {{- range $app := .Values.argocdApplications -}}
 {{ if not .disable }}
 apiVersion: argoproj.io/v1alpha1
@@ -14,8 +13,7 @@ spec:
     path: {{ .path }}
     {{- if default $.Values.global.helmDefault .helm }}
     helm:
-      valueFiles:
-      - {{ $.Values.global.valuesFile }}
+      valueFiles: {{ $.Values.global.defaultValueFiles .valueFiles }}
     {{- end }}
   destination:
     namespace: {{ default $.Values.global.spec.destination.namespace  .namespace }}
