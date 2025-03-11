@@ -1,2 +1,7 @@
 global:
   domain: argocd-lappis.ipea.gov.br
+redis-ha:
+  # TODO: idealmente deveriamos setar esse valor para true
+  # mas por hora o ambiente ainda não possui o mínimo de 3
+  # nós para rodar o redis em ha
+  enabled: false
