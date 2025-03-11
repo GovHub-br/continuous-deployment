@@ -93,7 +93,7 @@ helm repo add argo https://argoproj.github.io/argo-helm
 helm repo update
 kubectl create ns argocd
 # para instalar o argo em si
-helm -n argocd install argocd argo/argo-cd \
+helm -n argocd install argocd argo/argo-cd --version 6.4.1 \
     -f https://gitlab.com/lappis-unb/gest-odadosipea/infra-lappis-ipea/-/raw/main/argocd/values.yaml \
     -f https://gitlab.com/lappis-unb/gest-odadosipea/infra-lappis-ipea/-/raw/main/argocd/values.prod.yaml
 # para criar o app of apps
