@@ -8,3 +8,21 @@ helmCharts:
     releaseName: superset
     namespace: superset
     valuesFile: ../base/values.yaml
+    valuesInline:
+      ingress:
+        enabled: true
+        ingressClassName: "external-nginx"
+        annotations:
+          cert-manager.io/issuer: "superset-ui"
+          acme.cert-manager.io/http01-edit-in-place: "true"
+          nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+          nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+          nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+        path: "/"
+        pathType: ImplementationSpecific
+        hosts:
+          - "govhub-br.lappis.rocks"
+        tls:
+          - secretName: ingress-superset-ui
+            hosts:
+              - "govhub-br.lappis.rocks"
