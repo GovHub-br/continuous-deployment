@@ -1,0 +1,63 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+- name: airflow
+  repo: https://gitlab.com/api/v4/projects/55454661/packages/helm/stable
+  version: 1.12.1
+  releaseName: airflow
+  namespace: lappis
+  valuesFile: ../base/values.yaml
+  valuesInline:
+    ingress:
+      web:
+        enabled: true
+        annotations: {
+          "cert-manager.io/issuer": "airflow-web",
+          "acme.cert-manager.io/http01-edit-in-place": "true"
+        }
+        path: "/"
+        # The hostnames or hosts configuration for the web Ingress
+        hosts:
+        - name: "airflow-lappis.ipea.gov.br"
+          tls:
+            enabled: true
+            secretName: "ingress-airflow-web"
+        ingressClassName: "external-nginx"
+
+    workers:
+      livenessProbe:
+        failureThreshold: 30
+
+    scheduler:
+      startupProbe:
+        failureThreshold: 30
+
+    webserver:
+      startupProbe:
+        failureThreshold: 30
+      service:
+        type: ClusterIP
+        annotations: {}
+        ports:
+          - name: airflow-ui
+            port: 8080
+            targetPort: 8080
+
+    # Git sync
+    dags:
+      gitSync:
+        branch: main
+        rev: HEAD
+        # # The git revision (branch, tag, or hash) to check out, v4 only
+        # ref: v2-2-stable
+
+patches:
+- path: ../base/create-user-job-patch.yaml
+  target:
+    kind: Job
+    labelSelector: component=create-user-job
+
+resources:
+  - ../base
+  - airflow-web-issuer.yaml
