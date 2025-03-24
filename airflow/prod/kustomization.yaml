@@ -37,7 +37,7 @@ helmCharts:
       startupProbe:
         failureThreshold: 30
       service:
-        type: ClusterIP
+        type: NodePort
         annotations: {}
         ports:
           - name: airflow-ui
