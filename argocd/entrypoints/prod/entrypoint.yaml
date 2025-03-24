@@ -46,3 +46,26 @@ spec:
       - CreateNamespace=true
       - ApplyOutOfSyncOnly=true
 ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: airflow
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: "https://gitlab.com/lappis-unb/gest-odadosipea/infra-lappis-ipea.git"
+    targetRevision: feat/overlay
+    path: airflow/prod
+    plugin:
+      name: kustomized-helm
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: airflow
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

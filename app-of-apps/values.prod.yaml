@@ -3,7 +3,11 @@ argocdApplications:
     path: jupyterhub/prod
   # Vamos habilitar ainda
   airflow:
-    disable: true
+    name: airflow
+    namespace: airflow
+    disable: false
+    path: airflow/prod
+    helm: true
   superset:
     disable: true
     path: superset/prod
