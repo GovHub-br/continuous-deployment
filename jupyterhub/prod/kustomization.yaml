@@ -11,9 +11,6 @@ helmCharts:
   valuesInline:
     singleuser:
       storage:
-        dynamic:
-          storageAccessModes: [ReadWriteOnce]
-          storageClass: longhorn-rwo
         extraVolumes:
           - name: cert-volume
             secret:
@@ -25,4 +22,3 @@ helmCharts:
 
 resources:
 - shared-storage-pvc.yaml
-- longhorn-rwo.yaml

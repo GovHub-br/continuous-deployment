@@ -1,0 +1,17 @@
+global:
+  postgresql:
+    auth:
+      postgresPassword: "postgres"
+      username: "postgres"
+      password: "postgres"
+primary:
+  persistence:
+    enabled: true
+    existingClaim: shared-storage-postgres
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
