@@ -1,0 +1,22 @@
+argocdApplications:
+  jupyterhub:
+    path: jupyterhub/prod
+  # Vamos habilitar ainda
+  airflow:
+    disable: true
+  superset:
+    disable: true
+    path: superset/prod
+  # Instalamos igual como está em homologação
+  keda: {}
+  kube-prometheus-stack: {}
+  # Já vêm instalado em produção
+  ingress-nginx:
+    disable: true
+  cert-manager:
+    disable: true
+  # Não necessário em produção
+  longhorn:
+    disable: true
+  minio:
+    disable: true
