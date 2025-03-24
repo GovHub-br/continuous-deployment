@@ -6,7 +6,7 @@ helmCharts:
     repo: https://charts.bitnami.com/bitnami
     version: 15.0.0
     releaseName: postgres-release
-    namespace: lappis
+    namespace: postgres
     valuesFile: values.yaml
 
 resources:

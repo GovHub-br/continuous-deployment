@@ -19,4 +19,8 @@ argocdApplications:
   longhorn:
     disable: true
   minio:
-    disable: true
+    name: minio
+    namespace: minio
+    disable: false
+    path: minio
+    helm: true
