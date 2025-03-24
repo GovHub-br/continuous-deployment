@@ -1,0 +1,26 @@
+# TODO: precisamos apontar esse application para um app of apps novo
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jupyterhub
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: "https://gitlab.com/lappis-unb/gest-odadosipea/infra-lappis-ipea.git"
+    targetRevision: feat/overlay
+    path: jupyterhub/prod
+    plugin:
+      name: kustomized-helm
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: jupyterhub
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+---

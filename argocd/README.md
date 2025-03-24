@@ -2,6 +2,8 @@
 argocd
 ===========
 
+# Ambiente de homologação
+
 Instalação do Argo CD em um cluster Kubernetes a partir do Helm/Kustomize. Necessário para usar o app of apps e para instalar o Airflow com Kustomize.
 
 - [CRDs](#crds)
@@ -81,3 +83,24 @@ helm upgrade --install \
   argocd ./charts/argo-cd --namespace argocd \
   --post-renderer ./helm_post_renderer.sh
 ```
+
+# Ambiente de produção
+
+Para instalar o argocd na infraestrutura de produção é preciso entrar no shell do ambiente e rodar os seguintes comandos
+
+```bash
+helm repo add argo https://argoproj.github.io/argo-helm
+helm repo update
+kubectl create ns argocd
+# para instalar o argo em si
+helm -n argocd install argocd argo/argo-cd --version 6.4.1 \
+    -f https://gitlab.com/lappis-unb/gest-odadosipea/infra-lappis-ipea/-/raw/main/argocd/values.yaml \
+    -f https://gitlab.com/lappis-unb/gest-odadosipea/infra-lappis-ipea/-/raw/main/argocd/values.prod.yaml
+# para criar o app of apps
+kubectl -n argocd apply \ 
+    -f https://gitlab.com/lappis-unb/gest-odadosipea/infra-lappis-ipea/-/raw/main/argocd/application.prod.yaml
+```
+
+Para atualizar basta trocar o comando de `install` por `upgrade` e para desinstalar é `helm -n argocd uninstall argocd`
+
+Obs.: Para a instalação funcionar é necessário acesso global no cluster para aplicar os CRDs do argo
