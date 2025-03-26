@@ -58,6 +58,32 @@ helmCharts:
       - envName: SIAFI_PASSWORD
         secretName: "siafi-credentials"
         secretKey: password
+      - envName: AIRFLOW__SMTP__SMTP_HOST
+        secretName: "airflow-smtp"
+        secretKey: host
+      - envName: AIRFLOW__SMTP__SMTP_STARTTLS
+        secretName: "airflow-smtp"
+        secretKey: starttls
+      # mutually exclusive with SMTP_STARTTLS
+      - envName: AIRFLOW__SMTP__SMTP_SSL
+        secretName: "airflow-smtp"
+        secretKey: ssl
+      - envName: AIRFLOW__SMTP__SMTP_USER
+        secretName: "airflow-smtp"
+        secretKey: user
+      - envName: AIRFLOW__SMTP__SMTP_PASSWORD
+        secretName: "airflow-smtp"
+        secretKey: password
+      # use port 465 if SMTP_SSL is True
+      - envName: AIRFLOW__SMTP__SMTP_PORT
+        secretName: "airflow-smtp"
+        secretKey: port
+      - envName: AIRFLOW__SMTP__SMTP_MAIL_FROM
+        secretName: "airflow-smtp"
+        secretKey: mail_from
+      - envName: AIRFLOW_CONN_AWS_DEFAULT
+        secretName: "minio-airflow-svcacct"
+        secretKey: AIRFLOW_CONN_AWS_DEFAULT
 
     # Git sync
     dags:
