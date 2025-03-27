@@ -46,18 +46,29 @@ helmCharts:
             nodePort: 31151
 
     secret:
+      # SIAFI
       - envName: SIAFI_CERT
         secretName: "extrator-ipea-certificate"
-        secretKey: cert
+        secretKey: tls.crt
       - envName: SIAFI_KEY
         secretName: "extrator-ipea-certificate"
-        secretKey: key
+        secretKey: tls.key
       - envName: SIAFI_USERNAME
         secretName: "siafi-credentials"
         secretKey: username
       - envName: SIAFI_PASSWORD
         secretName: "siafi-credentials"
         secretKey: password
+      - envName: SIAFI_CPF_SERPRO
+        secretName: "siafi-serpro-credentials"
+        secretKey: SIAFI_CPF_SERPRO
+      - envName: SIAFI_BEARER_KEY_SERPRO
+        secretName: "siafi-serpro-credentials"
+        secretKey: SIAFI_BEARER_KEY_SERPRO
+      - envName: SIAFI_BEARER_SECRET_SERPRO
+        secretName: "siafi-serpro-credentials"
+        secretKey: SIAFI_BEARER_SECRET_SERPRO
+      # AIRFLOW
       - envName: AIRFLOW__SMTP__SMTP_HOST
         secretName: "airflow-smtp"
         secretKey: host
