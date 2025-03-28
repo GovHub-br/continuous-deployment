@@ -28,6 +28,32 @@ helmCharts:
     workers:
       livenessProbe:
         failureThreshold: 30
+      extraVolumes:
+        - name: cert-volume
+          secret:
+            secretName: extrator-ipea-certificate
+        - name: tmp
+          persistentVolumeClaim:
+            claimName: airflow-tmp
+        - name: bkps
+          persistentVolumeClaim:
+            claimName: airflow-bkps
+        - name: great-expectations
+          persistentVolumeClaim:
+            claimName: airflow-great-expectations
+      extraVolumeMounts:
+        - name: cert-volume
+          mountPath: "/etc/tls/certs"
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+          readOnly: false
+        - name: bkps
+          mountPath: /var/backups
+          readOnly: false
+        - name: great-expectations
+          mountPath: /opt/airflow/include/great-expectations
+          readOnly: false
 
     scheduler:
       startupProbe:
@@ -48,10 +74,10 @@ helmCharts:
     secret:
       # SIAFI
       - envName: SIAFI_CERT
-        secretName: "extrator-ipea-certificate"
+        secretName: "siafi-path-cert"
         secretKey: tls.crt
       - envName: SIAFI_KEY
-        secretName: "extrator-ipea-certificate"
+        secretName: "siafi-path-cert"
         secretKey: tls.key
       - envName: SIAFI_USERNAME
         secretName: "siafi-credentials"
