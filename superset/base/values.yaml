@@ -20,6 +20,12 @@ extraEnvRaw:
       secretKeyRef:
         name: superset-secret-key
         key: SUPERSET_SECRET_KEY
+    
+configOverrides:
+  feature_flags: |
+    FEATURE_FLAGS = {
+        "ENABLE_TEMPLATE_PROCESSING": True
+    }
 
 envFromSecret: custom-superset-env
 secretEnv:

@@ -9,9 +9,6 @@ helmCharts:
     namespace: superset
     valuesFile: ../base/values.yaml
     valuesInline:
-      configOverrides:
-        enable_template_processing: |
-          ENABLE_TEMPLATE_PROCESSING = True
       ingress:
         enabled: true
         ingressClassName: "external-nginx"
