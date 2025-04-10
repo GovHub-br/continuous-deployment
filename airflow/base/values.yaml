@@ -91,12 +91,14 @@ extraEnv: |
     value: "#FFCBDB"
   # TODO: always remember to sync with `run-airflow-migrations-job-patch.yaml` and `create-user-job-patch.yaml`
   - name: PYTHONPATH
-    value: "/usr/local/lib/python312.zip:/usr/local/lib/python3.12:/usr/local/lib/python3.12/lib-dynload:/home/airflow/.local/lib/python3.12/site-packages:/opt/airflow/dags-config/repo:/opt/airflow/dags-config/repo/airflow_lappis/plugins:/opt/airflow/dags-config/repo/airflow_lappis/dags:/opt/airflow/dags-config/repo/airflow_lappis/config:/home/airflow/.local/bin/airflow:/home/airflow/.local/bin:/opt/airflow/dags-config/repo/airflow_lappis/helpers"
+    value: "/usr/local/lib/python312.zip:/usr/local/lib/python3.12:/usr/local/lib/python3.12/lib-dynload:/home/airflow/.local/lib/python3.12/site-packages:/opt/airflow/dags-data/repo:/opt/airflow/dags-data/repo/airflow_lappis/plugins:/opt/airflow/dags-data/repo/airflow_lappis/dags:/opt/airflow/dags-data/repo/airflow_lappis/config:/home/airflow/.local/bin/airflow:/home/airflow/.local/bin:/opt/airflow/dags-data/repo/airflow_lappis/helpers"
 
   - name: AIRFLOW__CORE__PLUGINS_FOLDER
-    value: /opt/airflow/dags-config/repo/airflow_lappis/plugins
+    value: /opt/airflow/dags-data/repo/airflow_lappis/plugins
   - name: AIRFLOW__CORE__DAGS_FOLDER
-    value: /opt/airflow/dags-config/repo/airflow_lappis/dags
+    value: /opt/airflow/dags-data/repo/airflow_lappis/dags
+  - name: AIRFLOW_REPO_BASE
+    value: /opt/airflow/dags-data/repo/airflow_lappis
 
 # Airflow database & redis config
 data:
@@ -152,9 +154,6 @@ workers:
   - name: bkps
     persistentVolumeClaim:
       claimName: airflow-bkps
-  - name: dags-data
-    persistentVolumeClaim:
-      claimName: airflow-dags-data
   - name: great-expectations
     persistentVolumeClaim:
       claimName: airflow-great-expectations
@@ -164,9 +163,6 @@ workers:
     readOnly: false
   - name: bkps
     mountPath: /var/backups
-    readOnly: false
-  - name: dags-data
-    mountPath: /opt/airflow/dags-data
     readOnly: false
   - name: great-expectations
     mountPath: /opt/airflow/include/great-expectations
@@ -194,15 +190,6 @@ scheduler:
     enabled: true
     # Number of days to retain logs
     retentionDays: 2
-
-  extraVolumes:
-  - name: dags-data
-    persistentVolumeClaim:
-      claimName: airflow-dags-data
-  extraVolumeMounts:
-  - name: dags-data
-    mountPath: /opt/airflow/dags-data
-    readOnly: false
 
 # can't disable only with Helm values
 createUserJob:
@@ -258,9 +245,10 @@ triggerer:
 dags:
   # Where dags volume will be mounted. Works for both persistence and gitSync.
   # If not specified, dags mount path will be set to $AIRFLOW_HOME/dags
-  mountPath: /opt/airflow/dags-config
+  mountPath: /opt/airflow/dags-data
   persistence:
-    enabled: false
+    enabled: true
+    existingClaim: airflow-dags-data
   gitSync:
     enabled: true
     repo: https://gitlab.com/lappis-unb/gest-odadosipea/app-lappis-ipea

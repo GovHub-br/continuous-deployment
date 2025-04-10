@@ -21,8 +21,8 @@ helmCharts:
         path: "/"
         pathType: ImplementationSpecific
         hosts:
-          - "govhub-br.lappis.rocks"
+          - "superset-lappis.ipea.gov.br"
         tls:
           - secretName: ingress-superset-ui
             hosts:
-              - "govhub-br.lappis.rocks"
+              - "superset-lappis.ipea.gov.br"

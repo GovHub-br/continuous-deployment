@@ -11,16 +11,14 @@ helmCharts:
   valuesInline:
     singleuser:
       storage:
-        capacity: 10Gi
-    hub:
-      extraVolumes:
-        - name: cert-volume
-          secret:
-            secretName: extrator-ipea-certificate
-      extraVolumeMounts:
-        - name: cert-volume
-          mountPath: "/etc/tls/certs"
-          readOnly: true
+        extraVolumes:
+          - name: cert-volume
+            secret:
+              secretName: extrator-ipea-certificate
+        extraVolumeMounts:
+          - name: cert-volume
+            mountPath: "/etc/tls/certs"
+            readOnly: true
 
 resources:
 - shared-storage-pvc.yaml

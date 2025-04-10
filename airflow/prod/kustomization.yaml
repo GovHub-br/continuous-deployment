@@ -1,0 +1,141 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+- name: airflow
+  repo: https://gitlab.com/api/v4/projects/55454661/packages/helm/stable
+  version: 1.12.1
+  releaseName: airflow
+  namespace: airflow
+  valuesFile: ../base/values.yaml
+  valuesInline:
+    ingress:
+      web:
+        enabled: true
+        annotations: {
+          "cert-manager.io/issuer": "airflow-web",
+          "acme.cert-manager.io/http01-edit-in-place": "true"
+        }
+        path: "/"
+        # The hostnames or hosts configuration for the web Ingress
+        hosts:
+        - name: "airflow-lappis.ipea.gov.br"
+          tls:
+            enabled: true
+            secretName: "ingress-airflow-web"
+        ingressClassName: "external-nginx"
+
+    workers:
+      livenessProbe:
+        failureThreshold: 30
+      extraVolumes:
+        - name: cert-volume
+          secret:
+            secretName: extrator-ipea-certificate
+        - name: tmp
+          persistentVolumeClaim:
+            claimName: airflow-tmp
+        - name: bkps
+          persistentVolumeClaim:
+            claimName: airflow-bkps
+        - name: great-expectations
+          persistentVolumeClaim:
+            claimName: airflow-great-expectations
+      extraVolumeMounts:
+        - name: cert-volume
+          mountPath: "/etc/tls/certs"
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+          readOnly: false
+        - name: bkps
+          mountPath: /var/backups
+          readOnly: false
+        - name: great-expectations
+          mountPath: /opt/airflow/include/great-expectations
+          readOnly: false
+
+    scheduler:
+      startupProbe:
+        failureThreshold: 30
+
+    webserver:
+      startupProbe:
+        failureThreshold: 30
+      service:
+        type: NodePort
+        annotations: {}
+        ports:
+          - name: airflow-ui
+            port: 8080
+            targetPort: 8080
+            nodePort: 31151
+
+    secret:
+      # SIAFI
+      - envName: SIAFI_CERT
+        secretName: "siafi-path-cert"
+        secretKey: tls.crt
+      - envName: SIAFI_KEY
+        secretName: "siafi-path-cert"
+        secretKey: tls.key
+      - envName: SIAFI_USERNAME
+        secretName: "siafi-credentials"
+        secretKey: username
+      - envName: SIAFI_PASSWORD
+        secretName: "siafi-credentials"
+        secretKey: password
+      - envName: SIAFI_CPF_SERPRO
+        secretName: "siafi-serpro-credentials"
+        secretKey: SIAFI_CPF_SERPRO
+      - envName: SIAFI_BEARER_KEY_SERPRO
+        secretName: "siafi-serpro-credentials"
+        secretKey: SIAFI_BEARER_KEY_SERPRO
+      - envName: SIAFI_BEARER_SECRET_SERPRO
+        secretName: "siafi-serpro-credentials"
+        secretKey: SIAFI_BEARER_SECRET_SERPRO
+      # AIRFLOW
+      - envName: AIRFLOW__SMTP__SMTP_HOST
+        secretName: "airflow-smtp"
+        secretKey: host
+      - envName: AIRFLOW__SMTP__SMTP_STARTTLS
+        secretName: "airflow-smtp"
+        secretKey: starttls
+      # mutually exclusive with SMTP_STARTTLS
+      - envName: AIRFLOW__SMTP__SMTP_SSL
+        secretName: "airflow-smtp"
+        secretKey: ssl
+      - envName: AIRFLOW__SMTP__SMTP_USER
+        secretName: "airflow-smtp"
+        secretKey: user
+      - envName: AIRFLOW__SMTP__SMTP_PASSWORD
+        secretName: "airflow-smtp"
+        secretKey: password
+      # use port 465 if SMTP_SSL is True
+      - envName: AIRFLOW__SMTP__SMTP_PORT
+        secretName: "airflow-smtp"
+        secretKey: port
+      - envName: AIRFLOW__SMTP__SMTP_MAIL_FROM
+        secretName: "airflow-smtp"
+        secretKey: mail_from
+      - envName: AIRFLOW_CONN_AWS_DEFAULT
+        secretName: "minio-airflow-svcacct"
+        secretKey: AIRFLOW_CONN_AWS_DEFAULT
+
+    # Git sync
+    dags:
+      gitSync:
+        branch: main
+        rev: HEAD
+        # # The git revision (branch, tag, or hash) to check out, v4 only
+        # ref: v2-2-stable
+
+patches:
+- path: ../base/create-user-job-patch.yaml
+  target:
+    kind: Job
+    labelSelector: component=create-user-job
+
+resources:
+  - ../base
+  - airflow-web-issuer.yaml
