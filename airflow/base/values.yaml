@@ -49,6 +49,24 @@ secret:
   - envName: AIRFLOW_CONN_AWS_DEFAULT
     secretName: "minio-airflow-svcacct"
     secretKey: AIRFLOW_CONN_AWS_DEFAULT
+  - envName: DB_DW_DBNAME
+    secretName: "db-dw-analytics"
+    secretKey: DB_DW_DBNAME
+  - envName: DB_DW_HOST
+    secretName: "db-dw-host"
+    secretKey: DB_DW_HOST
+  - envName: DB_DW_PASSWORD
+    secretName: "db-dw-password"
+    secretKey: DB_DW_PASSWORD
+  - envName: DB_DW_PORT
+    secretName: "db-dw-port"
+    secretKey: DB_DW_PORT
+  - envName: DB_DW_SCHEMA
+    secretName: "db-dw-schema"
+    secretKey: DB_DW_SCHEMA
+  - envName: DB_DW_USER
+    secretName: "db-dw-user"
+    secretKey: DB_DW_USER
 
 extraEnv: |
   - name: AIRFLOW__METRICS__METRICS_ALLOW_LIST
