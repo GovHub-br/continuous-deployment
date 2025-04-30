@@ -94,6 +94,19 @@ helmCharts:
       - envName: SIAFI_BEARER_SECRET_SERPRO
         secretName: "siafi-serpro-credentials"
         secretKey: SIAFI_BEARER_SECRET_SERPRO
+      # SIAPE
+      - envName: SIAPE_BEARER_PASSWORD
+        secretName: "siape-credentials"
+        secretKey: SIAPE_BEARER_PASSWORD
+      - envName: SIAPE_BEARER_USER
+        secretName: "siape-credentials"
+        secretKey: SIAPE_BEARER_USER
+      - envName: SIAPE_CPF_USER
+        secretName: "siape-credentials"
+        secretKey: SIAPE_CPF_USER
+      - envName: SIAPE_PASSWORD_USER
+        secretName: "siape-credentials"
+        secretKey: SIAPE_PASSWORD_USER
       # AIRFLOW
       - envName: AIRFLOW__SMTP__SMTP_HOST
         secretName: "airflow-smtp"
