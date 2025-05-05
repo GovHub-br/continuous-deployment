@@ -29,5 +29,5 @@ argocdApplications:
     name: minio
     namespace: minio
     disable: false
-    path: minio
+    path: minio/prod
     helm: true
