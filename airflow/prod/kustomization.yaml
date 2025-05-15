@@ -14,16 +14,18 @@ helmCharts:
         enabled: true
         annotations: {
           "cert-manager.io/issuer": "airflow-web",
-          "acme.cert-manager.io/http01-edit-in-place": "true"
+          "acme.cert-manager.io/http01-edit-in-place": "true",
+          "nginx.ingress.kubernetes.io/rewrite-target": "/"
         }
         path: "/"
+        pathType: Prefix
         # The hostnames or hosts configuration for the web Ingress
         hosts:
-        - name: "airflow-lappis.ipea.gov.br"
+        - name: "airflow.lappis.ipea.gov.br"
           tls:
             enabled: true
             secretName: "ingress-airflow-web"
-        ingressClassName: "external-nginx"
+        ingressClassName: "nginx"
 
     workers:
       livenessProbe:
