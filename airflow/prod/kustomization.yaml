@@ -15,7 +15,9 @@ helmCharts:
         annotations: {
           "cert-manager.io/issuer": "airflow-web",
           "acme.cert-manager.io/http01-edit-in-place": "true",
-          "nginx.ingress.kubernetes.io/rewrite-target": "/"
+          "nginx.ingress.kubernetes.io/proxy-connect-timeout": "300",
+          "nginx.ingress.kubernetes.io/proxy-read-timeout": "300",
+          "nginx.ingress.kubernetes.io/proxy-send-timeout": "300"
         }
         path: "/"
         pathType: Prefix
