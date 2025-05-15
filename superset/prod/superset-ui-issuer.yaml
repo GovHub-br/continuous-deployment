@@ -1,13 +1,13 @@
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: airflow-web
+  name: superset-ui
 spec:
   acme:
     email: infraestrutura.lappis@gmail.com
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
-      name: letsencrypt-airflow-web
+      name: letsencrypt-superset-ui
     # Add a single challenge solver, HTTP01 using nginx
     solvers:
     - http01:
