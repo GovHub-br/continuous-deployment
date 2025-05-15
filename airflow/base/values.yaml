@@ -1,8 +1,8 @@
 useStandardNaming: true
 
 defaultAirflowRepository: registry.gitlab.com/lappis-unb/gest-odadosipea/app-lappis-ipea/airflow-ipea
-defaultAirflowTag: "latest"
-airflowVersion: "2.8.1"
+defaultAirflowTag: "feat-openmetadata-dc3170e0"
+airflowVersion: "2.9.1"
 
 
 
