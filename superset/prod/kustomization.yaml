@@ -11,7 +11,7 @@ helmCharts:
     valuesInline:
       ingress:
         enabled: true
-        ingressClassName: "external-nginx"
+        ingressClassName: "nginx"
         annotations:
           cert-manager.io/issuer: "superset-ui"
           acme.cert-manager.io/http01-edit-in-place: "true"
@@ -21,8 +21,8 @@ helmCharts:
         path: "/"
         pathType: ImplementationSpecific
         hosts:
-          - "superset-lappis.ipea.gov.br"
+          - "superset.lappis.ipea.gov.br"
         tls:
           - secretName: ingress-superset-ui
             hosts:
-              - "superset-lappis.ipea.gov.br"
+              - "superset.lappis.ipea.gov.br"
