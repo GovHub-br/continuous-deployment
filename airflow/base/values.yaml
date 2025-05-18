@@ -67,11 +67,11 @@ extraEnv: |
   - name: AIRFLOW__API__AUTH_BACKENDS
     value: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
   - name: AIRFLOW__OPENMETADATA_AIRFLOW_APIS__DAG_RUNNER_TEMPLATE
-    value: "/opt/airflow/dags-data/repo/airflow_lappis/dag_templates/dag_runner.j2"
+    value: "/opt/airflow/dag_templates/dag_runner.j2"
   - name: AIRFLOW__OPENMETADATA_AIRFLOW_APIS__DAG_GENERATED_CONFIGS
-    value: "/opt/airflow/dags-data/repo/airflow_lappis/dag_generated_configs"
+    value: "/opt/airflow/dag_generated_configs"
   - name: AIRFLOW__OPENMETADATA_AIRFLOW_APIS__DAG_MANAGED_OPERATORS
-    value: "/opt/airflow/dags-data/repo/airflow_lappis/dag_managed_operators"
+    value: "/opt/airflow/dag_managed_operators"
   - name: AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT
     value: "120"
   - name: AIRFLOW__CORE__DAG_FILE_PROCESSOR_TIMEOUT
@@ -97,12 +97,12 @@ extraEnv: |
     value: "#FFCBDB"
   # TODO: always remember to sync with `run-airflow-migrations-job-patch.yaml` and `create-user-job-patch.yaml`
   - name: PYTHONPATH
-    value: "/usr/local/lib/python312.zip:/usr/local/lib/python3.12:/usr/local/lib/python3.12/lib-dynload:/home/airflow/.local/lib/python3.12/site-packages:/opt/airflow/dags-data/repo:/opt/airflow/dags-data/repo/airflow_lappis/plugins:/opt/airflow/dags-data/repo/airflow_lappis/dags:/opt/airflow/dags-data/repo/airflow_lappis/config:/home/airflow/.local/bin/airflow:/home/airflow/.local/bin:/opt/airflow/dags-data/repo/airflow_lappis/helpers"
+    value: "/usr/local/lib/python312.zip:/usr/local/lib/python3.12:/usr/local/lib/python3.12/lib-dynload:/home/airflow/.local/lib/python3.12/site-packages:/opt/airflow/dags-data/repo:/opt/airflow/dags-data/repo/airflow_lappis/plugins:/opt/airflow/dags:/opt/airflow/dags-data/repo/airflow_lappis/config:/home/airflow/.local/bin/airflow:/home/airflow/.local/bin:/opt/airflow/dags-data/repo/airflow_lappis/helpers"
 
   - name: AIRFLOW__CORE__PLUGINS_FOLDER
     value: /opt/airflow/dags-data/repo/airflow_lappis/plugins
   - name: AIRFLOW__CORE__DAGS_FOLDER
-    value: /opt/airflow/dags-data/repo/airflow_lappis/dags
+    value: /opt/airflow/dags
   - name: AIRFLOW_REPO_BASE
     value: /opt/airflow/dags-data/repo/airflow_lappis
 
@@ -229,7 +229,7 @@ scheduler:
     retentionDays: 2
 
   extraVolumes:
-    - name: plugins
+    - name: dag-managed
       emptyDir: {}
     - name: dag-templates
       emptyDir: {}
@@ -237,12 +237,12 @@ scheduler:
       emptyDir: {}
 
   extraVolumeMounts:
-    - name: plugins
-      mountPath: /opt/airflow/dags-data/repo/airflow_lappis/plugins
+    - name: dag-managed
+      mountPath: /opt/airflow/dag_managed_operators
     - name: dag-templates
-      mountPath: /opt/airflow/dags-data/repo/airflow_lappis/dag_templates
+      mountPath: /opt/airflow/dag_templates
     - name: dag-generated
-      mountPath: /opt/airflow/dags-data/repo/airflow_lappis/dag_generated_configs
+      mountPath: /opt/airflow/dag_generated_configs
 
 # can't disable only with Helm values
 createUserJob:
@@ -287,11 +287,11 @@ webserver:
 
   extraVolumeMounts:
     - name: dag-managed
-      mountPath: /opt/airflow/dags-data/repo/airflow_lappis/dag_managed_operators
+      mountPath: /opt/airflow/dag_managed_operators
     - name: dag-templates
-      mountPath: /opt/airflow/dags-data/repo/airflow_lappis/dag_templates
+      mountPath: /opt/airflow/dag_templates
     - name: dag-generated
-      mountPath: /opt/airflow/dags-data/repo/airflow_lappis/dag_generated_configs
+      mountPath: /opt/airflow/dag_generated_configs
 
 # Desnecessario, pois o pgcat ja eh utilizado
 pgbouncer:
