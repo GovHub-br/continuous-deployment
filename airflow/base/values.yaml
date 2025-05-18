@@ -66,6 +66,12 @@ extraEnv: |
 
   - name: AIRFLOW__API__AUTH_BACKENDS
     value: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
+  - name: AIRFLOW__OPENMETADATA_AIRFLOW_APIS__DAG_RUNNER_TEMPLATE
+    value: "/opt/airflow/dags-data/repo/airflow_lappis/dag_templates/dag_runner.j2"
+  - name: AIRFLOW__OPENMETADATA_AIRFLOW_APIS__DAG_GENERATED_CONFIGS
+    value: "/opt/airflow/dags-data/repo/airflow_lappis/dag_generated_configs"
+  - name: AIRFLOW__OPENMETADATA_AIRFLOW_APIS__DAG_MANAGED_OPERATORS
+    value: "/opt/airflow/dags-data/repo/airflow_lappis/dag_managed_operators"
   - name: AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT
     value: "120"
   - name: AIRFLOW__CORE__DAG_FILE_PROCESSOR_TIMEOUT
@@ -222,6 +228,22 @@ scheduler:
     # Number of days to retain logs
     retentionDays: 2
 
+  extraVolumes:
+    - name: plugins
+      emptyDir: {}
+    - name: dag-templates
+      emptyDir: {}
+    - name: dag-generated
+      emptyDir: {}
+
+  extraVolumeMounts:
+    - name: plugins
+      mountPath: /opt/airflow/dags-data/repo/airflow_lappis/plugins
+    - name: dag-templates
+      mountPath: /opt/airflow/dags-data/repo/airflow_lappis/dag_templates
+    - name: dag-generated
+      mountPath: /opt/airflow/dags-data/repo/airflow_lappis/dag_generated_configs
+
 # can't disable only with Helm values
 createUserJob:
   # Next two lines are necessary when using "helm install --wait (...)" or Argo CD
@@ -254,6 +276,22 @@ webserver:
       port: 8080
       targetPort: 8080
       nodePort: 30007
+
+  extraVolumes:
+    - name: dag-managed
+      emptyDir: {}
+    - name: dag-templates
+      emptyDir: {}
+    - name: dag-generated
+      emptyDir: {}
+
+  extraVolumeMounts:
+    - name: dag-managed
+      mountPath: /opt/airflow/dags-data/repo/airflow_lappis/dag_managed_operators
+    - name: dag-templates
+      mountPath: /opt/airflow/dags-data/repo/airflow_lappis/dag_templates
+    - name: dag-generated
+      mountPath: /opt/airflow/dags-data/repo/airflow_lappis/dag_generated_configs
 
 # Desnecessario, pois o pgcat ja eh utilizado
 pgbouncer:
