@@ -1,10 +1,8 @@
 useStandardNaming: true
 
-defaultAirflowRepository: registry.gitlab.com/lappis-unb/gest-odadosipea/app-lappis-ipea/airflow-ipea
-defaultAirflowTag: "latest"
-airflowVersion: "2.8.1"
-
-
+defaultAirflowRepository: registry.gitlab.com/lappis-unb/gest-odadosipea/app-lappis-ipea
+defaultAirflowTag: "2.10.5"
+airflowVersion: "2.10.5"
 
 executor: "CeleryKubernetesExecutor"
 
@@ -66,6 +64,21 @@ extraEnv: |
 
   - name: AIRFLOW__API__AUTH_BACKENDS
     value: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
+  
+  # -------------------OPENMETADATA------------------------
+
+  - name: AIRFLOW__OPENMETADATA_AIRFLOW_APIS__DAG_RUNNER_TEMPLATE
+    value: "/opt/airflow/dag_templates/dag_runner.j2"
+
+    # Sempre que um DAG é criado a partir do OpenMetadata, ele também cria um arquivo JSON com algumas informações sobre o fluxo de trabalho que precisa ser executado
+  - name: AIRFLOW__OPENMETADATA_AIRFLOW_APIS__DAG_GENERATED_CONFIGS
+    value: "/opt/airflow/dag_generated_configs"
+
+    # 
+  - name: AIRFLOW__OPENMETADATA_AIRFLOW_APIS__DAG_MANAGED_OPERATORS
+    value: "/opt/airflow/dag_managed_operators"
+
+  # -------------------------------------------
   - name: AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT
     value: "120"
   - name: AIRFLOW__CORE__DAG_FILE_PROCESSOR_TIMEOUT
@@ -91,12 +104,12 @@ extraEnv: |
     value: "#FFCBDB"
   # TODO: always remember to sync with `run-airflow-migrations-job-patch.yaml` and `create-user-job-patch.yaml`
   - name: PYTHONPATH
-    value: "/usr/local/lib/python312.zip:/usr/local/lib/python3.12:/usr/local/lib/python3.12/lib-dynload:/home/airflow/.local/lib/python3.12/site-packages:/opt/airflow/dags-data/repo:/opt/airflow/dags-data/repo/airflow_lappis/plugins:/opt/airflow/dags-data/repo/airflow_lappis/dags:/opt/airflow/dags-data/repo/airflow_lappis/config:/home/airflow/.local/bin/airflow:/home/airflow/.local/bin:/opt/airflow/dags-data/repo/airflow_lappis/helpers"
+    value: "/usr/local/lib/python312.zip:/usr/local/lib/python3.12:/usr/local/lib/python3.12/lib-dynload:/home/airflow/.local/lib/python3.12/site-packages:/opt/airflow/dags-data/repo:/opt/airflow/dags-data/repo/airflow_lappis/plugins:/opt/airflow/dags-data/repo/airflow_lappis/dags:/opt/airflow/dags-data/repo/airflow_lappis/config:/home/airflow/.local/bin/airflow:/home/airflow/.local/bin:/opt/airflow/dags-data/repo/airflow_lappis/helpers:/opt/airflow/dags"
 
   - name: AIRFLOW__CORE__PLUGINS_FOLDER
     value: /opt/airflow/dags-data/repo/airflow_lappis/plugins
   - name: AIRFLOW__CORE__DAGS_FOLDER
-    value: /opt/airflow/dags-data/repo/airflow_lappis/dags
+    value: /opt/airflow/dags
   - name: AIRFLOW_REPO_BASE
     value: /opt/airflow/dags-data/repo/airflow_lappis
 
@@ -188,6 +201,10 @@ workers:
   - name: great-expectations
     persistentVolumeClaim:
       claimName: airflow-great-expectations
+  - name: dags-openmetadata
+    persistentVolumeClaim:
+      claimName: airflow-dags-openmetadata
+
   extraVolumeMounts:
   - name: tmp
     mountPath: /tmp
@@ -198,6 +215,18 @@ workers:
   - name: great-expectations
     mountPath: /opt/airflow/include/great-expectations
     readOnly: false
+  - name: dags-openmetadata
+    mountPath: /opt/airflow/dag_managed_operators
+    subPath: dag_managed_operators
+  - name: dags-openmetadata
+    mountPath: /opt/airflow/dag_templates
+    subPath: dag_templates
+  - name: dags-openmetadata
+    mountPath: /opt/airflow/dag_generated_configs
+    subPath: dag_generated_configs
+  - name: dags-openmetadata
+    mountPath: /opt/airflow/dags
+    subPath: dags
 
 redis:
   passwordSecretName: airflow-redis-password
@@ -205,7 +234,7 @@ redis:
 # Airflow scheduler settings
 scheduler:
   enabled: true
-  replicas: 3
+  replicas: 1
   # # Max number of old replicasets to retain
   # revisionHistoryLimit: ~
 
@@ -221,6 +250,25 @@ scheduler:
     enabled: true
     # Number of days to retain logs
     retentionDays: 2
+
+  extraVolumes:
+    - name: dags-openmetadata
+      persistentVolumeClaim:
+        claimName: airflow-dags-openmetadata
+
+  extraVolumeMounts:
+    - name: dags-openmetadata
+      mountPath: /opt/airflow/dag_managed_operators
+      subPath: dag_managed_operators
+    - name: dags-openmetadata
+      mountPath: /opt/airflow/dag_templates
+      subPath: dag_templates
+    - name: dags-openmetadata
+      mountPath: /opt/airflow/dag_generated_configs
+      subPath: dag_generated_configs
+    - name: dags-openmetadata
+      mountPath: /opt/airflow/dags
+      subPath: dags
 
 # can't disable only with Helm values
 createUserJob:
@@ -255,13 +303,32 @@ webserver:
       targetPort: 8080
       nodePort: 30007
 
+  extraVolumes:
+    - name: dags-openmetadata
+      persistentVolumeClaim:
+        claimName: airflow-dags-openmetadata
+
+  extraVolumeMounts:
+    - name: dags-openmetadata
+      mountPath: /opt/airflow/dag_managed_operators
+      subPath: dag_managed_operators
+    - name: dags-openmetadata
+      mountPath: /opt/airflow/dag_templates
+      subPath: dag_templates
+    - name: dags-openmetadata
+      mountPath: /opt/airflow/dag_generated_configs
+      subPath: dag_generated_configs
+    - name: dags-openmetadata
+      mountPath: /opt/airflow/dags
+      subPath: dags
+
 # Desnecessario, pois o pgcat ja eh utilizado
 pgbouncer:
   enabled: false
 
 triggerer:
   enabled: true
-  replicas: 3
+  replicas: 1
 
   # already storing logs in MinIO
   persistence:
@@ -271,6 +338,25 @@ triggerer:
     enabled: true
     # Number of days to retain logs
     retentionDays: 2
+
+  extraVolumes:
+    - name: dags-openmetadata
+      persistentVolumeClaim:
+        claimName: airflow-dags-openmetadata
+
+  extraVolumeMounts:
+    - name: dags-openmetadata
+      mountPath: /opt/airflow/dag_managed_operators
+      subPath: dag_managed_operators
+    - name: dags-openmetadata
+      mountPath: /opt/airflow/dag_templates
+      subPath: dag_templates
+    - name: dags-openmetadata
+      mountPath: /opt/airflow/dag_generated_configs
+      subPath: dag_generated_configs
+    - name: dags-openmetadata
+      mountPath: /opt/airflow/dags
+      subPath: dags
 
 # Git sync
 dags:

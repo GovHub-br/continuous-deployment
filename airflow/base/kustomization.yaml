@@ -16,3 +16,4 @@ resources:
   - airflow-great-expectations-pvc.yaml
   - airflow-dags-data-pvc.yaml
   - airflow-bkps-pvc.yaml
+  - airflow-openmetadata-pvc.yaml
