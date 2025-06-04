@@ -1,9 +1,8 @@
 useStandardNaming: true
 
-defaultAirflowRepository: criptoempi/new-airflow
-defaultAirflowTag: "2.9.1"
-airflowVersion: "2.9.1"
-
+defaultAirflowRepository: registry.gitlab.com/lappis-unb/gest-odadosipea/app-lappis-ipea
+defaultAirflowTag: "2.10.5"
+airflowVersion: "2.10.5"
 
 executor: "CeleryKubernetesExecutor"
 

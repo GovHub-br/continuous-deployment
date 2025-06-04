@@ -1,0 +1,12 @@
+dependencies:
+- name: mysql
+  repository: https://charts.bitnami.com/bitnami
+  version: 9.7.2
+- name: airflow
+  repository: https://airflow-helm.github.io/charts
+  version: 8.9.0
+- name: opensearch
+  repository: https://opensearch-project.github.io/helm-charts/
+  version: 2.12.1
+digest: sha256:0298930834efbe36e8d5d3f8b49f7265926b6c8e424ed13715abe08a8be53020
+generated: "2024-06-11T16:50:19.017705+05:30"
