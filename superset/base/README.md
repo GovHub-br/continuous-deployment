@@ -5,15 +5,22 @@ superset
 
 ### Secret Key
 
+Execute:
+
+```
 openssl rand -base64 42
+```
 
 exemplo de saida
 
-``` WnsoGvMXoyRYyA/dDtfY7Qmxfjx/M5hETAkUPZyvC6TJpdhoeZa3vwUN ```
+``` 
+WnsoGvMXoyRYyA/dDtfY7Qmxfjx/M5hETAkUPZyvC6TJpdhoeZa3vwUN
+```
 
-Criando a secrets no k8s
+Criando a secrets no k8s, substitua pela secret gerada
 
-```  kubectl create secret generic superset-secret-key --from-literal=SUPERSET_SECRET_KEY='WnsoGvMXoyRYyA/dDtfY7Qmxfjx/M5hETAkUPZyvC6TJpdhoeZa3vwUN' \  -n <seu-namespace>
+``` 
+kubectl create secret generic superset-secret-key --from-literal=SUPERSET_SECRET_KEY='WnsoGvMXoyRYyA/dDtfY7Qmxfjx/M5hETAkUPZyvC6TJpdhoeZa3vwUN' \  -n <seu-namespace>
 ```
 
 ### Acesso ao Redis e ao Postgres
