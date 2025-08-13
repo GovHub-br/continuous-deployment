@@ -82,13 +82,24 @@ extraEnv: |
   - name: AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL
     value: "120"
   - name: AIRFLOW__SCHEDULER__TASK_QUEUED_TIMEOUT
-    value: "60"
+    value: "600"
   - name: AIRFLOW__SCHEDULER__TASK_QUEUED_TIMEOUT_CHECK_INTERVAL
     value: "20"
   - name: AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE
     value: America/Sao_Paulo
   - name: AIRFLOW__WEBSERVER__NAVBAR_COLOR
     value: "#FFCBDB"
+
+  # Configs para celery
+  - name: AIRFLOW__CELERY__TASK_ACKS_LATE
+    value: "True"
+  - name: AIRFLOW__CELERY__WORKER_PREFETCH_MULTIPLIER
+    value: "1"
+  - name: AIRFLOW__CELERY__TASK_TRACK_STARTED
+    value: "True"
+  - name: AIRFLOW__CELERY__BROKER_TRANSPORT_OPTIONS
+    value: '{"visibility_timeout": 21600}'
+
   # TODO: always remember to sync with `run-airflow-migrations-job-patch.yaml` and `create-user-job-patch.yaml`
   - name: PYTHONPATH
     value: "/usr/local/lib/python312.zip:/usr/local/lib/python3.12:/usr/local/lib/python3.12/lib-dynload:/home/airflow/.local/lib/python3.12/site-packages:/opt/airflow/dags-data/repo:/opt/airflow/dags-data/repo/airflow_lappis/plugins:/opt/airflow/dags-data/repo/airflow_lappis/dags:/opt/airflow/dags-data/repo/airflow_lappis/config:/home/airflow/.local/bin/airflow:/home/airflow/.local/bin:/opt/airflow/dags-data/repo/airflow_lappis/helpers"
@@ -205,7 +216,7 @@ redis:
 # Airflow scheduler settings
 scheduler:
   enabled: true
-  replicas: 3
+  replicas: 2
   # # Max number of old replicasets to retain
   # revisionHistoryLimit: ~
 
