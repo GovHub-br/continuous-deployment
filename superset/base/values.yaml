@@ -26,7 +26,6 @@ configOverrides:
     FEATURE_FLAGS = {
         "ENABLE_TEMPLATE_PROCESSING": True,
         "EMBEDDED_SUPERSET": True,
-        "EMBEDDED_SUPERSET_SECURITY_MANAGER": True,
     }
 
 envFromSecret: custom-superset-env
