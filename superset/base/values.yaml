@@ -20,12 +20,18 @@ extraEnvRaw:
       secretKeyRef:
         name: superset-secret-key
         key: SUPERSET_SECRET_KEY
+  - name: GUEST_TOKEN_JWT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: superset-guest-token
+        key: GUEST_TOKEN_JWT_SECRET
     
 configOverrides:
   feature_flags: |
     FEATURE_FLAGS = {
         "ENABLE_TEMPLATE_PROCESSING": True,
         "EMBEDDED_SUPERSET": True,
+        "GUEST_TOKEN_JWT_SECRET": os.environ.get("GUEST_TOKEN_JWT_SECRET"),
     }
 
 envFromSecret: custom-superset-env
