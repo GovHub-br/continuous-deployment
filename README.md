@@ -7,6 +7,7 @@ Este documento descreve as instruções para acesso aos serviços de infraestrut
 ## Pré-requisitos
 1. **Acesso à VPN**: Para acessar os serviços mencionados abaixo, é obrigatório estar conectado à rede VPN fornecida pela equipe de infraestrutura.
 2. **Solicitação de Credenciais**: As credenciais de cada serviço devem ser solicitadas diretamente à equipe de infraestrutura.
+3. **Definição de secrets**: Antes de utilizar os serviços, é necessário definir os secrets de acesso das aplicações, como do airflow ou superset. As secrets necessárias são encontradas nas pastas do repositório, num readme individual para cada aplicação.
 
 ---
 
