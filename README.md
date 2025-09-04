@@ -14,6 +14,8 @@ Este documento descreve as instruções para acesso aos serviços de infraestrut
 - Segue o fluxo de dependências em imagem:
 ![Fluxo de Dependências](./assets/dependency_graph_production.png)
 
+---
+
 ## Serviços Disponíveis
 
 ### ArgoCD
