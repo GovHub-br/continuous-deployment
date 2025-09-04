@@ -14,37 +14,19 @@ resources:
     cpu: 500m
     memory: 1Gi
 
+extraEnvRaw:
+  - name: SUPERSET_SECRET_KEY
+    valueFrom:
+      secretKeyRef:
+        name: superset-secret-key
+        key: SUPERSET_SECRET_KEY
+    
 configOverrides:
-  security_public.py: |
-    AUTH_ROLE_PUBLIC = "Public"
-    PUBLIC_ROLE_LIKE = "Gamma"
-
-  csp_embed.py: |
-    TALISMAN_ENABLED = True
-    TALISMAN_CONFIG = {
-      "content_security_policy": {
-        "default-src": ["'self'"],
-        "img-src": ["'self'", "data:", "blob:"],
-        "worker-src": ["'self'", "blob:"],
-        "connect-src": ["'self'"],
-        "style-src": ["'self'", "'unsafe-inline'"],
-        "script-src": ["'self'", "'strict-dynamic'"],
-        "frame-ancestors": [
-          "http://*.lappis.ipea.gov.br",
-          "http://localhost:*"
-          # dica: evite "*" aqui; alguns ambientes/browsers ignoram/estranham
-        ],
-      },
-      "content_security_policy_nonce_in": ["script-src"],  # << ADICIONE ISTO
-      "force_https": False,
-      "session_cookie_secure": False
-    }
-
-  feature_flags.py: |
+  feature_flags: |
     FEATURE_FLAGS = {
-      "ENABLE_TEMPLATE_PROCESSING": True
+        "ENABLE_TEMPLATE_PROCESSING": True,
+        "EMBEDDED_SUPERSET": True,
     }
-
 
 envFromSecret: custom-superset-env
 secretEnv:
