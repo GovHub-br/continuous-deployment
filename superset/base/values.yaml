@@ -20,49 +20,12 @@ extraEnvRaw:
       secretKeyRef:
         name: superset-secret-key
         key: SUPERSET_SECRET_KEY
-  - name: GUEST_TOKEN_JWT_SECRET
-    valueFrom:
-      secretKeyRef:
-        name: superset-guest-token
-        key: GUEST_TOKEN_JWT_SECRET
     
 configOverrides:
-  # 1) Usuário anônimo e base de permissões
-  security_public.py: |
-    # Habilita acesso anônimo e base semelhante à Gamma
-    AUTH_ROLE_PUBLIC = "Public"
-    PUBLIC_ROLE_LIKE = "Gamma"
-
-  # 2) CSP/Talisman para permitir que SUPERESET seja iframado
-  #    Ajuste os domínios abaixo para os LOCAIS onde o iframe VAI RODAR.
-  #    Como é HTTP, mantemos force_https=False e cookies sem 'secure'.
-  csp_embed.py: |
-    TALISMAN_ENABLED = True
-    TALISMAN_CONFIG = {
-      "content_security_policy": {
-        "default-src": ["'self'"],
-        "img-src": ["'self'", "data:", "blob:"],
-        "worker-src": ["'self'", "blob:"],
-        "connect-src": ["'self'"],
-        "style-src": ["'self'", "'unsafe-inline'"],
-        "script-src": ["'self'", "'strict-dynamic'"],
-        # Permite que páginas desses domínios hospedem o iframe do Superset
-        # -> ajuste para o(s) domínio(s) onde o IFRAME ficará embutido
-        "frame-ancestors": [
-          "http://*.lappis.ipea.gov.br",
-          "http://localhost:*",
-          "*"
-        ],
-      },
-      "force_https": False,
-      "session_cookie_secure": False
-    }
-
-  # 3) (Opcional) Outras flags que você já usava; REMOVEMOS EMBEDDED_SUPERSET e guest token
-  feature_flags.py: |
+  feature_flags: |
     FEATURE_FLAGS = {
-      "ENABLE_TEMPLATE_PROCESSING": True
-      # NÃO habilite "EMBEDDED_SUPERSET" aqui, pois esta opção é para fluxo com Guest Token (JWT)
+        "ENABLE_TEMPLATE_PROCESSING": True,
+        "EMBEDDED_SUPERSET": True,
     }
 
 envFromSecret: custom-superset-env
