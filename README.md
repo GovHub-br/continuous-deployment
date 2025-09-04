@@ -10,32 +10,44 @@ Este documento descreve as instruções para acesso aos serviços de infraestrut
 
 ---
 
+## Fluxo de dependências
+- Segue o fluxo de dependências em imagem:
+![Fluxo de Dependências](./assets/dependency_graph_production.png)
+
 ## Serviços Disponíveis
 
+### ArgoCD
+- **Descrição**: Ferramenta de GitOps e entrega contínua.
+- **Endereço**: `<Definir>`
+- **Porta**: `<Definir>`
+- **Acesso**: Conectar-se ao host indicado após autenticação via VPN.
+
 ### MinIO
-- **Descrição**: Serviço de armazenamento de objetos.
-- **Endereço**: `10.0.0.70:30006`
+- **Descrição**: Serviço de armazenamento de objetos, sendo esses dados e logs.
+- **Endereço**: `<Definir>`
+- **porta**: `<Definir>`
 - **Acesso**: Conectar-se ao host indicado após autenticação via VPN.
 
 ### Superset
-- **Descrição**: Plataforma de visualização de dados.
+- **Descrição**: Plataforma de visualização de dados em formato de Dashboards e BI, se conecta ao PostgreSQL interno para aplicar metastore e a config/metadata do Superset.
 - **Endereço**: [ipea-superset.lappis.rocks](https://ipea-superset.lappis.rocks/)
 - **Acesso**: Acessível pelo navegador, após conexão VPN.
 
 ### Airflow
-- **Descrição**: Gerenciamento de fluxos de trabalho.
+- **Descrição**: Orquestração de dados ETL/ELT, se conecta ao PostgreSQL para aplicar metastore, estado, DAG runs e conexões, se conecta ao MinIO para armazenar logs e outputs de jobs, além de fazer ingestão, transformação e carga de dados para o banco de dados do Lakehouse.
 - **Endereço**: [ipea-airflow.lappis.rocks](https://ipea-airflow.lappis.rocks/)
 - **Acesso**: Acessível pelo navegador, após conexão VPN.
 
 ### Analytics Database
-- **Descrição**: Banco de dados para armazenamento e consulta de dados analíticos.
-- **Endereço**: `10.0.0.73`
-- **Porta**: `5432`
+- **Descrição**: Banco de dados para armazenamento e consulta de dados analíticos, do Lakehouse.
+- **Endereço**: `<definir>`
+- **Porta**: `<definir>`
 - **Acesso**: Necessário configurar cliente de banco de dados (como DBeaver) e estabelecer conexão via VPN.
 
 ### JupyterHub
-- **Descrição**: Ambiente de notebooks colaborativo.
-- **Endereço**: `10.0.0.70:30010`
+- **Descrição**: Notebooks e análise exploratória de APIs.
+- **Endereço**: `<definir>`
+- **Porta**: `<definir>`
 - **Acesso**: Conectar-se ao endereço do host após autenticação via VPN.
 
 ---
