@@ -133,15 +133,15 @@ kubectl create ns argocd
 
 ```bash
 helm -n argocd install argocd argo/argo-cd --version 6.4.1 \
-  -f https://gitlab.com/lappis-unb/gest-odadosipea/infra-lappis-ipea/-/raw/main/argocd/values.yaml \
-  -f https://gitlab.com/lappis-unb/gest-odadosipea/infra-lappis-ipea/-/raw/main/argocd/values.prod.yaml
+  -f https://raw.githubusercontent.com/GovHub-br/continuous-deployment/refs/heads/main/argocd/values.yaml \
+  -f https://raw.githubusercontent.com/GovHub-br/continuous-deployment/refs/heads/main/argocd/values.prod.yaml
 ```
 
 3. **Criar o app-of-apps (produção)**:
 
 ```bash
 kubectl -n argocd apply -f \
-  https://gitlab.com/lappis-unb/gest-odadosipea/infra-lappis-ipea/-/raw/main/argocd/application.prod.yaml
+  https://raw.githubusercontent.com/GovHub-br/continuous-deployment/refs/heads/main/argocd/application.prod.yaml
 ```
 
 > Para **atualizar**, troque `install` por `upgrade`.

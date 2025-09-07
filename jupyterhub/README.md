@@ -58,13 +58,13 @@ Há três formas de instalação, documentadas a seguir.
 Clonar este repositório.
 
 ```bash
-git clone git@gitlab.com:lappis-unb/gest-odadosipea/infra-lappis-ipea.git
+git clone https://github.com/GovHub-br/continuous-deployment.git
 ```
 
-Navegar até a pasta 'infra-lappis-ipea/jupyterhub'.
+Navegar até a pasta 'continuous-deployment/jupyterhub'.
 
 ```bash
-cd infra-lappis-ipea
+cd continuous-deployment
 cd jupyterhub
 ```
 

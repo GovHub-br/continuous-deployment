@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: "https://gitlab.com/lappis-unb/gest-odadosipea/infra-lappis-ipea.git"
+    repoURL: "https://github.com/GovHub-br/continuous-deployment.git"
     targetRevision: main
     path: app-of-apps
     helm:
