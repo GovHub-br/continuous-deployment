@@ -38,7 +38,7 @@ configOverrides:
     TALISMAN_ENABLED = True
     TALISMAN_CONFIG = {
       "content_security_policy": {
-        "frame-ancestors": ["'self'", "https://*.lappis.ipea.gov.br"],
+        "frame-ancestors": ["'self'", "https://*.lappis.ipea.gov.br", "http://localhost:8000"],
       },
       "frame_options": None,
     }
