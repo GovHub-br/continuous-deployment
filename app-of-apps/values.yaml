@@ -20,6 +20,7 @@ argocdApplications:
     path: superset
     targetRevision: HEAD
     helm: false
+    syncWave: 1
 
   minio:
     name: minio
@@ -29,6 +30,7 @@ argocdApplications:
     path: minio
     targetRevision: HEAD
     helm: true
+    syncWave: -4
 
   jupyterhub:
     name: jupyterhub
@@ -38,6 +40,7 @@ argocdApplications:
     path: jupyterhub
     targetRevision: HEAD
     helm: false
+    syncWave: 2
 
   postgres:
     name: postgres
@@ -47,6 +50,7 @@ argocdApplications:
     path: postgres
     targetRevision: HEAD
     helm: false
+    syncWave: -5
 
   airflow:
     name: airflow
@@ -56,3 +60,4 @@ argocdApplications:
     path: airflow
     targetRevision: HEAD
     helm: false
+    syncWave: 0
