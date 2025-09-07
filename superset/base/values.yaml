@@ -3,10 +3,16 @@ replicaCount: 2
 service:
   type: NodePort
   port: 8088
+  nodePort:
+    http: null
 
 resources:
-  limits: { cpu: "1", memory: "2Gi" }
-  requests: { cpu: "500m", memory: "1Gi" }
+  limits:
+    cpu: 1
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
 
 extraEnvRaw:
   - name: SUPERSET_SECRET_KEY
@@ -14,23 +20,20 @@ extraEnvRaw:
       secretKeyRef:
         name: superset-secret-key
         key: SUPERSET_SECRET_KEY
-  - name: GUEST_TOKEN_JWT_SECRET
-    valueFrom:
-      secretKeyRef:
-        name: superset-guest-token
-        key: GUEST_TOKEN_JWT_SECRET
 
 configOverrides:
-  "feature_flags.py": |
+  feature_flags: |
     FEATURE_FLAGS = {
-      "EMBEDDED_SUPERSET": True,
+        "ENABLE_TEMPLATE_PROCESSING": True,
+        "EMBEDDED_SUPERSET": True,
     }
 
-  "10-embed_guest.py": |
+  10-embed_guest.py: |
     ENABLE_GUEST_TOKEN = True
     GUEST_ROLE_NAME = "Embed"
-    GUEST_TOKEN_JWT_ALGO = "HS256"  # segredo via env
+    GUEST_TOKEN_JWT_ALGO = "HS256"   # segredo vem por env: GUEST_TOKEN_JWT_SECRET
 
+    # iframe + CSP (restrinja aos domínios que vão embutir)
     ALLOW_IFRAME_EMBED = True
     TALISMAN_ENABLED = True
     TALISMAN_CONFIG = {
@@ -40,7 +43,12 @@ configOverrides:
       "frame_options": None,
     }
 
+envFromSecret: custom-superset-env    # mantém seu secret existente
+secretEnv:
+  create: false
+
 postgresql:
   enabled: false
+
 redis:
   enabled: true
