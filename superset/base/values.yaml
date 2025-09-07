@@ -20,12 +20,32 @@ extraEnvRaw:
       secretKeyRef:
         name: superset-secret-key
         key: SUPERSET_SECRET_KEY
-    
+
 configOverrides:
+  # você já tinha feature flags aqui; mantive
   feature_flags: |
     FEATURE_FLAGS = {
         "ENABLE_TEMPLATE_PROCESSING": True,
-        "EMBEDDED_SUPERSET": True,
+        "EMBEDDED_SUPERSET": True,  # não é obrigatório p/ iframe público, mas não atrapalha
+    }
+
+  # novo arquivo de override (o nome vira o nome do arquivo dentro de superset_config.d/)
+  00-embed_public.py: |
+    # Permitir carregamento em <iframe>
+    ALLOW_IFRAME_EMBED = True
+
+    # Acesso anônimo baseado no papel Gamma
+    AUTH_ROLE_PUBLIC = "Public"
+    PUBLIC_ROLE_LIKE = "Gamma"
+
+    # CSP liberando qualquer host como "ancestor" (⚠️ inseguro; use só em teste)
+    TALISMAN_ENABLED = True
+    TALISMAN_CONFIG = {
+      "content_security_policy": {
+        "frame-ancestors": ["*"],
+      },
+      # Não enviar X-Frame-Options pelo Flask-Talisman
+      "frame_options": None,
     }
 
 envFromSecret: custom-superset-env
