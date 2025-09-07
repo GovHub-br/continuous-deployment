@@ -92,6 +92,8 @@ O fluxo padrão é **declarativo** via Argo CD:
 2. **App-of-apps**: o `application.<env>.yaml` cria o Application raiz; ao sincronizar, ele gera/aplica os filhos conforme `app-of-apps/values.<env>.yaml`.
 3. **Waves** garantem a ordem (ex.: Postgres/MinIO → Airflow → Superset/JupyterHub).
 
+![Diagrama de Infraestrutura — Homologação](./assets/dependency_graph_production.png)
+
 > Para **testes** pontuais, cada componente expõe um comando de **renderização/aplicação manual** (`kubectl kustomize ... | kubectl apply -f - -n <ns>`). Em produção, evite aplicar manualmente para não criar **drift**.
 
 ---
