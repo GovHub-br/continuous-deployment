@@ -29,6 +29,10 @@ configOverrides:
       "EMBEDDED_SUPERSET": True,
     }
 
+  00-public.py: |
+    AUTH_ROLE_PUBLIC = "Public"
+    PUBLIC_ROLE_LIKE = "Gamma"
+
   # 2) Embed via Guest Token + CSP do iframe + papel público
   10-embed_guest.py: |
     # --- Guest Token (SDK) ---
