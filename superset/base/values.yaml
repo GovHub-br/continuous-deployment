@@ -3,57 +3,52 @@ replicaCount: 2
 service:
   type: NodePort
   port: 8088
-  nodePort:
-    http: null
 
 resources:
-  limits:
-    cpu: 1
-    memory: 2Gi
-  requests:
-    cpu: 500m
-    memory: 1Gi
+  limits: { cpu: "1", memory: 2Gi }
+  requests: { cpu: "500m", memory: 1Gi }
 
+# --- Segredos em env (sua secret já existente do SECRET_KEY)
 extraEnvRaw:
   - name: SUPERSET_SECRET_KEY
     valueFrom:
       secretKeyRef:
         name: superset-secret-key
         key: SUPERSET_SECRET_KEY
+  # segredo do Guest Token (crie a secret abaixo)
+  - name: GUEST_TOKEN_JWT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: superset-guest-token
+        key: GUEST_TOKEN_JWT_SECRET
 
 configOverrides:
-  # você já tinha feature flags aqui; mantive
-  feature_flags: |
+  feature_flags.py: |
     FEATURE_FLAGS = {
-        "ENABLE_TEMPLATE_PROCESSING": True,
-        "EMBEDDED_SUPERSET": True,  # não é obrigatório p/ iframe público, mas não atrapalha
+      "EMBEDDED_SUPERSET": True,
+      # os demais podem ficar como padrão
     }
 
-  # novo arquivo de override (o nome vira o nome do arquivo dentro de superset_config.d/)
-  00-embed_public.py: |
-    # Permitir carregamento em <iframe>
+  10-embed_guest.py: |
+    # Habilita Guest Token
+    ENABLE_GUEST_TOKEN = True
+    GUEST_ROLE_NAME = "Embed"               # papel somente-leitura que você criará
+    GUEST_TOKEN_JWT_ALGO = "HS256"
+    # segredos vêm por env: GUEST_TOKEN_JWT_SECRET
+
+    # Permite iFrame e define CSP para o(s) host(s) que VÃO embutir
     ALLOW_IFRAME_EMBED = True
-
-    # Acesso anônimo baseado no papel Gamma
-    AUTH_ROLE_PUBLIC = "Public"
-    PUBLIC_ROLE_LIKE = "Gamma"
-
-    # CSP liberando qualquer host como "ancestor" (⚠️ inseguro; use só em teste)
     TALISMAN_ENABLED = True
     TALISMAN_CONFIG = {
       "content_security_policy": {
-        "frame-ancestors": ["*"],
+        # RESTRINJA AQUI para os domínios que vão embutir
+        "frame-ancestors": ["'self'", "https://*.lappis.ipea.gov.br", "http://*.lappis.ipea.gov.br"],
       },
-      # Não enviar X-Frame-Options pelo Flask-Talisman
-      "frame_options": None,
+      "frame_options": None,  # evita X-Frame-Options
     }
 
-envFromSecret: custom-superset-env
-secretEnv:
-  create: false
 
 postgresql:
   enabled: false
-
 redis:
   enabled: true
