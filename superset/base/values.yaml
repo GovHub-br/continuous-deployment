@@ -3,6 +3,8 @@ replicaCount: 2
 service:
   type: NodePort
   port: 8088
+  nodePort:
+    http: null
 
 resources:
   limits:
@@ -12,18 +14,12 @@ resources:
     cpu: 500m
     memory: 1Gi
 
-# usa sua secret já existente p/ SECRET_KEY
 extraEnvRaw:
   - name: SUPERSET_SECRET_KEY
     valueFrom:
       secretKeyRef:
         name: superset-secret-key
         key: SUPERSET_SECRET_KEY
-
-# carrega envs adicionais (não cria nova secret)
-envFromSecret: custom-superset-env
-secretEnv:
-  create: false
 
 configOverrides:
   # 1) FEATURE FLAGS (nome do arquivo importa — melhor usar .py)
@@ -57,6 +53,10 @@ configOverrides:
       # evita X-Frame-Options conflitando com frame-ancestors
       "frame_options": None,
     }
+
+envFromSecret: custom-superset-env    # mantém seu secret existente
+secretEnv:
+  create: false
 
 postgresql:
   enabled: false
