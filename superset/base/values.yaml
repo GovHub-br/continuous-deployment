@@ -30,7 +30,7 @@ configOverrides:
 
   10-embed_guest.py: |
     ENABLE_GUEST_TOKEN = True
-    GUEST_ROLE_NAME = "Embed"
+    GUEST_ROLE_NAME = "Admin"
     GUEST_TOKEN_JWT_ALGO = "HS256"   # segredo vem por env: GUEST_TOKEN_JWT_SECRET
 
     # iframe + CSP (restrinja aos domínios que vão embutir)
