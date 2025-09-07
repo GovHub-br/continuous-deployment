@@ -30,10 +30,9 @@ configOverrides:
 
   10-embed_guest.py: |
     ENABLE_GUEST_TOKEN = True
-    GUEST_ROLE_NAME = "Admin"
-    GUEST_TOKEN_JWT_ALGO = "HS256"   # segredo vem por env: GUEST_TOKEN_JWT_SECRET
+    GUEST_ROLE_NAME = "Embed"
+    GUEST_TOKEN_JWT_ALGO = "HS256"
 
-    # iframe + CSP (restrinja aos domínios que vão embutir)
     ALLOW_IFRAME_EMBED = True
     TALISMAN_ENABLED = True
     TALISMAN_CONFIG = {
@@ -42,6 +41,29 @@ configOverrides:
       },
       "frame_options": None,
     }
+
+  20-ensure_embedded_pv.py: |
+    # Garante as Permission-Views de Embedded e concede ao papel Public no boot
+    from superset import app, db, security_manager as sm
+    with app.app_context():
+        role = sm.find_role("Public") or sm.add_role("Public")
+        for perm, view in [
+            ("can_read", "Embedded"),
+            ("menu_access", "Embedded"),
+            ("can_read", "EmbeddedDashboard"),
+            ("menu_access", "EmbeddedDashboard"),
+        ]:
+            pv = sm.find_permission_view_menu(perm, view)
+            if not pv:
+                sm.add_permission_view_menu(perm, view)
+                db.session.commit()
+                pv = sm.find_permission_view_menu(perm, view)
+            if pv and pv not in role.permissions:
+                role.permissions.append(pv)
+        db.session.commit()
+
+    # Garante que requests anônimos assumem o papel "Public"
+    AUTH_ROLE_PUBLIC = "Public"
 
 envFromSecret: custom-superset-env    # mantém seu secret existente
 secretEnv:
