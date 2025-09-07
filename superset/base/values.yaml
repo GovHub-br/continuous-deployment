@@ -5,17 +5,15 @@ service:
   port: 8088
 
 resources:
-  limits: { cpu: "1", memory: 2Gi }
-  requests: { cpu: "500m", memory: 1Gi }
+  limits: { cpu: "1", memory: "2Gi" }
+  requests: { cpu: "500m", memory: "1Gi" }
 
-# --- Segredos em env (sua secret já existente do SECRET_KEY)
 extraEnvRaw:
   - name: SUPERSET_SECRET_KEY
     valueFrom:
       secretKeyRef:
         name: superset-secret-key
         key: SUPERSET_SECRET_KEY
-  # segredo do Guest Token (crie a secret abaixo)
   - name: GUEST_TOKEN_JWT_SECRET
     valueFrom:
       secretKeyRef:
@@ -23,30 +21,24 @@ extraEnvRaw:
         key: GUEST_TOKEN_JWT_SECRET
 
 configOverrides:
-  feature_flags.py: |
+  "feature_flags.py": |
     FEATURE_FLAGS = {
       "EMBEDDED_SUPERSET": True,
-      # os demais podem ficar como padrão
     }
 
-  10-embed_guest.py: |
-    # Habilita Guest Token
+  "10-embed_guest.py": |
     ENABLE_GUEST_TOKEN = True
-    GUEST_ROLE_NAME = "Embed"               # papel somente-leitura que você criará
-    GUEST_TOKEN_JWT_ALGO = "HS256"
-    # segredos vêm por env: GUEST_TOKEN_JWT_SECRET
+    GUEST_ROLE_NAME = "Embed"
+    GUEST_TOKEN_JWT_ALGO = "HS256"   # segredo via env
 
-    # Permite iFrame e define CSP para o(s) host(s) que VÃO embutir
     ALLOW_IFRAME_EMBED = True
     TALISMAN_ENABLED = True
     TALISMAN_CONFIG = {
       "content_security_policy": {
-        # RESTRINJA AQUI para os domínios que vão embutir
-        "frame-ancestors": ["'self'", "https://*.lappis.ipea.gov.br", "http://*.lappis.ipea.gov.br"],
+        "frame-ancestors": ["'self'", "https://*.lappis.ipea.gov.br"],
       },
-      "frame_options": None,  # evita X-Frame-Options
+      "frame_options": None,
     }
-
 
 postgresql:
   enabled: false
