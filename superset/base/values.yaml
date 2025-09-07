@@ -3,8 +3,6 @@ replicaCount: 2
 service:
   type: NodePort
   port: 8088
-  nodePort:
-    http: null
 
 resources:
   limits:
@@ -14,6 +12,7 @@ resources:
     cpu: 500m
     memory: 1Gi
 
+# usa sua secret já existente p/ SECRET_KEY
 extraEnvRaw:
   - name: SUPERSET_SECRET_KEY
     valueFrom:
@@ -21,53 +20,43 @@ extraEnvRaw:
         name: superset-secret-key
         key: SUPERSET_SECRET_KEY
 
+# carrega envs adicionais (não cria nova secret)
+envFromSecret: custom-superset-env
+secretEnv:
+  create: false
+
 configOverrides:
-  feature_flags: |
+  # 1) FEATURE FLAGS (nome do arquivo importa — melhor usar .py)
+  feature_flags.py: |
     FEATURE_FLAGS = {
-        "ENABLE_TEMPLATE_PROCESSING": True,
-        "EMBEDDED_SUPERSET": True,
+      "ENABLE_TEMPLATE_PROCESSING": True,
+      "EMBEDDED_SUPERSET": True,
     }
 
+  # 2) Embed via Guest Token + CSP do iframe + papel público
   10-embed_guest.py: |
+    # --- Guest Token (SDK) ---
     ENABLE_GUEST_TOKEN = True
-    GUEST_ROLE_NAME = "Embed"
+    GUEST_ROLE_NAME = "Embed"           # papel do convidado (configure permissões no UI)
     GUEST_TOKEN_JWT_ALGO = "HS256"
+    # Ex.: deixar o token durar mais (opcional)
+    # GUEST_TOKEN_JWT_EXP_SECONDS = 43200  # 12h
 
+    # --- Acesso anônimo à CASCA do embed (GET /embedded/...) ---
+    # O primeiro GET do iframe é anônimo → usa o papel "Public"
+    AUTH_ROLE_PUBLIC = "Public"
+
+    # --- iFrame / CSP (Talisman) ---
     ALLOW_IFRAME_EMBED = True
     TALISMAN_ENABLED = True
     TALISMAN_CONFIG = {
       "content_security_policy": {
+        # domínios autorizados a "hospedar" o iframe
         "frame-ancestors": ["'self'", "https://*.lappis.ipea.gov.br", "http://localhost:8000"],
       },
+      # evita X-Frame-Options conflitando com frame-ancestors
       "frame_options": None,
     }
-
-  20-ensure_embedded_pv.py: |
-    # Garante as Permission-Views de Embedded e concede ao papel Public no boot
-    from superset import app, db, security_manager as sm
-    with app.app_context():
-        role = sm.find_role("Public") or sm.add_role("Public")
-        for perm, view in [
-            ("can_read", "Embedded"),
-            ("menu_access", "Embedded"),
-            ("can_read", "EmbeddedDashboard"),
-            ("menu_access", "EmbeddedDashboard"),
-        ]:
-            pv = sm.find_permission_view_menu(perm, view)
-            if not pv:
-                sm.add_permission_view_menu(perm, view)
-                db.session.commit()
-                pv = sm.find_permission_view_menu(perm, view)
-            if pv and pv not in role.permissions:
-                role.permissions.append(pv)
-        db.session.commit()
-
-    # Garante que requests anônimos assumem o papel "Public"
-    AUTH_ROLE_PUBLIC = "Public"
-
-envFromSecret: custom-superset-env    # mantém seu secret existente
-secretEnv:
-  create: false
 
 postgresql:
   enabled: false
