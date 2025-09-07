@@ -12,15 +12,6 @@ global:
       targetRevision: HEAD
 
 argocdApplications:
-  cert-manager:
-    name: cert-manager
-    namespace: cert-manager
-    disableAutomated: false
-    disable: false
-    path: cert-manager
-    targetRevision: HEAD
-    helm: true
-
   superset:
     name: superset
     namespace: superset
@@ -29,42 +20,6 @@ argocdApplications:
     path: superset
     targetRevision: HEAD
     helm: false
-
-  ingress-nginx:
-    name: ingress-nginx
-    namespace: ingress-nginx
-    disableAutomated: false
-    disable: false
-    path: ingress-nginx
-    targetRevision: HEAD
-    helm: true
-
-  keda:
-    name: keda
-    namespace: keda
-    disableAutomated: false
-    disable: false
-    path: keda
-    targetRevision: HEAD
-    helm: true
-
-  kube-prometheus-stack:
-    name: kube-prometheus-stack
-    namespace: monitoring
-    disableAutomated: false
-    disable: false
-    path: kube-prometheus-stack
-    targetRevision: HEAD
-    helm: true
-
-  longhorn:
-    name: longhorn
-    namespace: longhorn-system
-    disableAutomated: false
-    disable: false
-    path: longhorn
-    targetRevision: HEAD
-    helm: true
 
   minio:
     name: minio
@@ -80,7 +35,24 @@ argocdApplications:
     namespace: jupyterhub
     disableAutomated: false
     disable: false
-    path: jupyterhub/homolog
+    path: jupyterhub
+    targetRevision: HEAD
+    helm: false
 
-  # TODO: adicionar instalacoes q precisam de kustomize (airflow, jupyterhub, kube-vip)
+  postgres:
+    name: postgres
+    namespace: postgresql
+    disableAutomated: false
+    disable: false
+    path: postgres
+    targetRevision: HEAD
+    helm: false
 
+  airflow:
+    name: airflow
+    namespace: airflow
+    disableAutomated: false
+    disable: false
+    path: airflow
+    targetRevision: HEAD
+    helm: false
