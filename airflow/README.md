@@ -1,26 +1,42 @@
-airflow
-===========
+# Airflow
 
-Instalação do Airflow em um cluster Kubernetes a partir do ArgoCD. Antes, é necessário fazer o deploy do MinIO.
+Instalação do Airflow em um cluster Kubernetes a partir do Argo CD.  
+Antes, é necessário fazer o deploy do MinIO.
 
-- [Secrets](#secrets)
-- [Bucket](#bucket)
-- [Fernet Key](#fernet-key)
-- [PostgreSQL](#postgresql)
-- [Setup](#setup)
+- [Airflow](#airflow)
+  - [Secrets](#secrets)
+    - [Usuário admin](#usuário-admin)
+    - [SMTP](#smtp)
+    - [Git (DAGs/Plugins)](#git-dagsplugins)
+    - [Webserver Secret Key](#webserver-secret-key)
+    - [Redis (Celery/CeleryKubernetes)](#redis-celerycelerykubernetes)
+    - [Integrações externas (SIAFI, SERPRO, SIAPE)](#integrações-externas-siafi-serpro-siape)
+  - [Bucket](#bucket)
+  - [Fernet Key](#fernet-key)
+    - [Gerar (sem Python)](#gerar-sem-python)
+    - [Gerar (Python)](#gerar-python)
+    - [Secret](#secret)
+  - [PostgreSQL](#postgresql)
+  - [Setup](#setup)
+    - [Via Argo CD (recomendado)](#via-argo-cd-recomendado)
+    - [Aplicação manual (para testes)](#aplicação-manual-para-testes)
+
+---
 
 ## Secrets
 
-Criar namespace onde a ferramenta será instalada. Pular etapa caso namespace já exista.
+Crie o namespace (se ainda não existir):
 
 ```bash
 kubectl create namespace airflow
-```
+````
 
-Criação do usuário admin do Airflow. Substitua os campos: SUBSTITUA_POR_UM_USERNAME, SUBSTITUA_POR_UM_EMAIL, SUBSTITUA_POR_UM_FIRSTNAME, SUBSTITUA_POR_UM_LASTNAME e SUBSTITUA_POR_UM_PASSWORD.
+### Usuário admin
 
-```yaml
-kubectl -n airflow apply -f - <<EOF
+Criação do usuário admin do Airflow. Substitua os campos `USERNAME`, `EMAIL`, `FIRSTNAME`, `LASTNAME`, `PASSWORD`.
+
+```bash
+kubectl -n airflow apply -f - <<'EOF'
 apiVersion: v1
 kind: Secret
 metadata:
@@ -28,38 +44,42 @@ metadata:
 type: Opaque
 stringData:
   WEBSERVER_DEFAULT_USER_ROLE: Admin
-  WEBSERVER_DEFAULT_USER_USERNAME: SUBSTITUA_POR_UM_USERNAME
-  WEBSERVER_DEFAULT_USER_EMAIL: SUBSTITUA_POR_UM_EMAIL
-  WEBSERVER_DEFAULT_USER_FIRSTNAME: SUBSTITUA_POR_UM_FIRSTNAME
-  WEBSERVER_DEFAULT_USER_LASTNAME: SUBSTITUA_POR_UM_LASTNAME
-  WEBSERVER_DEFAULT_USER_PASSWORD: SUBSTITUA_POR_UM_PASSWORD
+  WEBSERVER_DEFAULT_USER_USERNAME: USERNAME
+  WEBSERVER_DEFAULT_USER_EMAIL: EMAIL
+  WEBSERVER_DEFAULT_USER_FIRSTNAME: FIRSTNAME
+  WEBSERVER_DEFAULT_USER_LASTNAME: LASTNAME
+  WEBSERVER_DEFAULT_USER_PASSWORD: PASSWORD
 EOF
 ```
 
-Criação de secret para envio de emails. Substitua os campos por valores apropriados. Obs: a senha "dfpceiqvijnrbvxt" (app password do gmail) é só um exemplo, não é utilizada para nada.
+### SMTP
 
-```yaml
-kubectl -n airflow apply -f - <<EOF
+Secret para envio de e-mails. Substitua `USER`, `PASSWORD` e ajuste host/porta se necessário.
+
+```bash
+kubectl -n airflow apply -f - <<'EOF'
 apiVersion: v1
 kind: Secret
 metadata:
   name: airflow-smtp
 type: Opaque
 stringData:
-  host: "smtp.gmail.com"
+  host: smtp.gmail.com
   starttls: "True"
   ssl: "False"
-  user: "infraestrutura.lappis@gmail.com"
-  password: "dfpceiqvijnrbvxt"
+  user: USER
+  password: PASSWORD
   port: "587"
-  mail_from: "infraestrutura.lappis@gmail.com"
+  mail_from: USER
 EOF
 ```
 
-Criação de Secret para acesso aos repositórios das dags e dos plugins. Substitua "SUBSTITUIR_POR_UM_PERSONAL_ACCESS_TOKEN".
+### Git (DAGs/Plugins)
 
-```yaml
-kubectl -n airflow apply -f - <<EOF
+Acesso aos repositórios de DAGs e plugins. Substitua `PERSONAL_ACCESS_TOKEN`.
+
+```bash
+kubectl -n airflow apply -f - <<'EOF'
 apiVersion: v1
 kind: Secret
 metadata:
@@ -67,37 +87,41 @@ metadata:
 type: Opaque
 stringData:
   GIT_SYNC_USERNAME: nonexistant
-  GIT_SYNC_PASSWORD: SUBSTITUIR_POR_UM_PERSONAL_ACCESS_TOKEN
+  GIT_SYNC_PASSWORD: PERSONAL_ACCESS_TOKEN
   GITSYNC_USERNAME: nonexistant
-  GITSYNC_PASSWORD: SUBSTITUIR_POR_UM_PERSONAL_ACCESS_TOKEN
+  GITSYNC_PASSWORD: PERSONAL_ACCESS_TOKEN
 EOF
 ```
 
-Criação da secret key do webserver do Airflow. Substitua "SUBSTITUA_POR_UMA_SECRET_KEY".
+### Webserver Secret Key
 
-```yaml
-kubectl -n airflow apply -f - <<EOF
+Secret para a chave do webserver. Substitua `SECRET_KEY`.
+
+```bash
+kubectl -n airflow apply -f - <<'EOF'
 apiVersion: v1
 kind: Secret
 metadata:
   name: airflow-webserver-secret-key
 type: Opaque
 stringData:
-  webserver-secret-key: SUBSTITUA_POR_UMA_SECRET_KEY
+  webserver-secret-key: SECRET_KEY
 EOF
 ```
 
-Caso o componente Redis do Helm chart do Airflow esteja ativado, caso o executor utilizado seja o CeleryExecutor ou o CeleryKubernetesExecutor, os docs do Airflow recomendam configurar uma senha estática para o Redis. Para configurar a senha estática, é necessário criar um Secret para a senha e um Secret para o broker url (ambos os Secrets devem conter a senha). Substitua "SUBSTITUA_POR_UMA_SENHA_PARA_O_REDIS".
+### Redis (Celery/CeleryKubernetes)
 
-```yaml
-kubectl -n airflow apply -f - <<EOF
+Somente se estiver usando **CeleryExecutor** ou **CeleryKubernetesExecutor**. Substitua `REDIS_PASSWORD`.
+
+```bash
+kubectl -n airflow apply -f - <<'EOF'
 apiVersion: v1
 kind: Secret
 metadata:
   name: airflow-redis-password
 type: Opaque
 stringData:
-  password: SUBSTITUA_POR_UMA_SENHA_PARA_O_REDIS
+  password: REDIS_PASSWORD
 ---
 apiVersion: v1
 kind: Secret
@@ -105,29 +129,79 @@ metadata:
   name: airflow-broker-url
 type: Opaque
 stringData:
-  connection: redis://:SUBSTITUA_POR_UMA_SENHA_PARA_O_REDIS@airflow-redis:6379/0
+  connection: redis://:REDIS_PASSWORD@airflow-redis:6379/0
 EOF
 ```
 
+### Integrações externas (SIAFI, SERPRO, SIAPE)
+
+Essas secrets são **críticas** para as DAGs conseguirem consumir as APIs.
+Substitua os valores conforme suas credenciais/certificados:
+
+```bash
+kubectl -n airflow apply -f - <<'EOF'
+apiVersion: v1
+kind: Secret
+metadata:
+  name: siafi-path-cert
+type: kubernetes.io/tls
+stringData:
+  tls.crt: CERTIFICADO_SIAFI
+  tls.key: CHAVE_SIAFI
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: siafi-credentials
+type: Opaque
+stringData:
+  username: SIAFI_USER
+  password: SIAFI_PASS
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: siafi-serpro-credentials
+type: Opaque
+stringData:
+  SIAFI_CPF_SERPRO: CPF
+  SIAFI_BEARER_KEY_SERPRO: BEARER_KEY
+  SIAFI_BEARER_SECRET_SERPRO: BEARER_SECRET
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: siape-credentials
+type: Opaque
+stringData:
+  SIAPE_BEARER_PASSWORD: BEARER_PASS
+  SIAPE_BEARER_USER: BEARER_USER
+  SIAPE_CPF_USER: CPF
+  SIAPE_PASSWORD_USER: PASS
+EOF
+```
+
+> **Importante:** sem essas secrets/certificados válidos, as requisições às APIs tendem a falhar (4xx/5xx).
+
+---
+
 ## Bucket
 
-No MinIO ou em um S3, criar bucket chamado "airflow-logs" e uma service account de nome (access key id) "airflow-svcacct".
+Crie no MinIO/S3 um bucket **`airflow-logs`** e uma service account **`airflow-svcacct`**.
+Depois, crie o Secret de conexão AWS para o Airflow:
 
-Antes de fazer o primeiro setup do Airflow, configurar o acesso ao bucket a partir de um Secret do Kubernetes.
-
-```yaml
-kubectl -n airflow apply -f - <<EOF
+```bash
+kubectl -n airflow apply -f - <<'EOF'
 apiVersion: v1
 kind: Secret
 metadata:
   name: minio-airflow-svcacct
 type: Opaque
 stringData:
-  # conn_id = aws_default
   AIRFLOW_CONN_AWS_DEFAULT: '{
     "conn_type": "aws",
-    "login": "SUBSTITUA_POR_UMA_ACCESS_KEY_ID",
-    "password": "SUBSTITUA_POR_UMA_SECRET_ACCESS_KEY",
+    "login": "ACCESS_KEY_ID",
+    "password": "SECRET_ACCESS_KEY",
     "extra": {
       "endpoint_url": "http://minio-svc.minio.svc.cluster.local:9000",
       "region_name": "us-east-1"
@@ -136,146 +210,89 @@ stringData:
 EOF
 ```
 
+---
+
 ## Fernet Key
 
-A chave Fernet é utilizada para encriptar as conexões no banco de dados, impedindo que sejam alteradas sem o uso da chave Fernet. Logo, para rotacionar a Fernet key, é necessário reencriptar partes do banco de dados do Airflow. A documentação do Airflow ensina como atualizar a Fernet key no seguinte link: <https://airflow.apache.org/docs/apache-airflow/2.7.3/security/secrets/fernet.html#rotating-encryption-keys>.
+A Fernet key encripta informações sensíveis no metastore do Airflow.
 
-### Gerar chave Fernet
-Para gerar uma chave Fernet, basta rodar o seguinte código em Python.
+### Gerar (sem Python)
+
+```bash
+head -c 32 /dev/urandom | base64 | tr '+/' '-_'
+```
+
+### Gerar (Python)
 
 ```python
 from cryptography.fernet import Fernet
-
-fernet_key = Fernet.generate_key()
-print(fernet_key.decode())  # your fernet_key, keep it in secured place!
+print(Fernet.generate_key().decode())
 ```
 
-### Kubernetes Secret
-Após gerar a chave fernet, substituir o campo "SUBSTITUIR_POR_FERNET_KEY" e criar o recurso Secret.
+### Secret
 
-```yaml
-kubectl -n airflow apply -f - <<EOF
+Substitua `FERNET_KEY`:
+
+```bash
+kubectl -n airflow apply -f - <<'EOF'
 apiVersion: v1
 kind: Secret
 metadata:
   name: airflow-fernet-key
 type: Opaque
 stringData:
-  fernet-key: SUBSTITUIR_POR_FERNET_KEY
+  fernet-key: FERNET_KEY
 EOF
 ```
 
-### Rotacionar chave Fernet
-
-Ver <https://airflow.apache.org/docs/apache-airflow/2.7.3/security/secrets/fernet.html#rotating-encryption-keys>
+---
 
 ## PostgreSQL
 
-É necessário criar uma database e um usuário que o Airflow vai usar para acessar a database. Substitua "NOME_DA_DATABASE", "NOME_DE_USUARIO", "SENHA".
+Crie a database e o usuário:
 
+```sql
+CREATE DATABASE DBNAME;
+CREATE USER DBUSER WITH PASSWORD 'PASSWORD';
+GRANT ALL PRIVILEGES ON DATABASE DBNAME TO DBUSER;
 
-```
-CREATE DATABASE NOME_DA_DATABASE;
-
-CREATE USER NOME_DE_USUARIO WITH PASSWORD 'SENHA';
-
-GRANT ALL PRIVILEGES ON DATABASE NOME_DA_DATABASE TO NOME_DE_USUARIO;
-
--- PostgreSQL 15 requires additional privileges:
-USE NOME_DA_DATABASE;
-
-GRANT ALL ON SCHEMA public TO NOME_DE_USUARIO;
+-- PostgreSQL 15:
+GRANT ALL ON SCHEMA public TO DBUSER;
 ```
 
-Criação do secret para acesso ao banco de dados PostgreSQL. Substitua as expressões "NOME_DE_USUARIO", "SENHA", "HOST", "PORT" e "NOME_DA_DATABASE".
+Secret de conexão:
 
-```yaml
-kubectl -n airflow apply -f - <<EOF
+```bash
+kubectl -n airflow apply -f - <<'EOF'
 apiVersion: v1
 kind: Secret
 metadata:
   name: airflow-metadata
 type: Opaque
 stringData:
-  connection: postgresql://NOME_DE_USUARIO:SENHA@HOST:PORT/NOME_DA_DATABASE
+  connection: postgresql://DBUSER:PASSWORD@HOST:PORT/DBNAME
 EOF
 ```
 
-Mais info: <https://airflow.apache.org/docs/apache-airflow/stable/howto/set-up-database.html#setting-up-a-postgresql-database>
+---
 
 ## Setup
-Há três formas de instalação, documentadas a seguir.
 
-### Via Helm
+### Via Argo CD (recomendado)
 
-Clonar este repositório.
+Este diretório é aplicado **automaticamente** pelo Argo CD através do **app-of-apps**.
+Quando o `Application` raiz sincroniza, o Argo CD cria/aplica o `Application` do Airflow, respeitando a ordem definida pelas **sync-waves** (ex.: Postgres/MinIO → Airflow → Superset).
 
-```bash
-git clone git@gitlab.com:lappis-unb/gest-odadosipea/infra-lappis-ipea.git
-```
+* Veja o README do **Argo CD**: `../argocd/README.md`
+* Veja o README do **app-of-apps**: `../app-of-apps/README.md`
 
-Navegar até a pasta 'infra-lappis-ipea/airflow'.
+### Aplicação manual (para testes)
 
-```bash
-cd infra-lappis-ipea
-cd airflow
-```
-
-Navegar até a pasta 'homolog' ou 'production', a depender do ambiente.
+Para testar diretamente no cluster (sem esperar a sync do Argo CD), aplique o comando dentro da pasta prod ou homolog:
 
 ```bash
-cd production
-# ou
-cd homolog
-```
-
-Clonar o repositório do nosso chart do Airflow para a pasta './charts/airflow'.
-
-```bash
-mkdir -p charts/airflow
-
-git clone git@gitlab.com:lappis-unb/decidimbr/infra/charts/airflow.git ./charts/airflow
-```
-
-Dar permissão para execução do script './helm_post_renderer.sh'.
-
-```bash
-chmod +x ./helm_post_renderer.sh
-```
-
-Instalar com Helm.
-
-```bash
-helm upgrade --install --wait \
-  airflow ./charts/airflow --namespace airflow \
-  --post-renderer ./helm_post_renderer.sh
-```
-
-### Via ArgoCD para o ambiente de homolog.
-
-```bash
-kubectl -n argocd apply -f - <<EOF
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: airflow-install
-  finalizers:
-  - resources-finalizer.argocd.argoproj.io
-spec:
-  destination:
-    name: ''
-    namespace: airflow
-    server: 'https://kubernetes.default.svc'
-  source:
-    path: 'airflow/homolog'
-    repoURL: 'https://gitlab.com/lappis-unb/gest-odadosipea/infra-lappis-ipea.git'
-    targetRevision: main
-    plugin:
-      name: kustomized-helm
-  sources: []
-  project: default
-  syncPolicy:
-    syncOptions:
-    - CreateNamespace=true
-EOF
+kubectl kustomize . \
+  --enable-helm \
+  --load-restrictor=LoadRestrictionsNone \
+| kubectl apply -f - -n airflow
 ```

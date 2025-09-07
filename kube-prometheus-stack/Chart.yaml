@@ -1,9 +1,0 @@
-apiVersion: 'v2'
-name: 'kube-prometheus-stack'
-description: 'kube prometheus stack'
-version: '0.1.0'
-type: application
-dependencies:
-- name: kube-prometheus-stack
-  repository: 'https://prometheus-community.github.io/helm-charts'
-  version: 56.9.0
