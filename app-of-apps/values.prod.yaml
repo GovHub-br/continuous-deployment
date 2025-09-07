@@ -11,3 +11,6 @@ argocdApplications:
 
   minio:
     path: minio/prod
+
+  postgres:
+    disable: true
