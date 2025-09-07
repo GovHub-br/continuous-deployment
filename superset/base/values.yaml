@@ -29,7 +29,7 @@ configOverrides:
   "10-embed_guest.py": |
     ENABLE_GUEST_TOKEN = True
     GUEST_ROLE_NAME = "Embed"
-    GUEST_TOKEN_JWT_ALGO = "HS256"   # segredo via env
+    GUEST_TOKEN_JWT_ALGO = "HS256"  # segredo via env
 
     ALLOW_IFRAME_EMBED = True
     TALISMAN_ENABLED = True
