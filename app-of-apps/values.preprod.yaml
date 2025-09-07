@@ -1,33 +1,15 @@
 argocdApplications:
   jupyterhub:
     path: jupyterhub/prod
-  # Vamos habilitar ainda
+
   airflow:
-    name: airflow
-    namespace: airflow
-    disable: false
     path: airflow/prod
+
   superset:
-    name: superset
-    namespace: superset
-    disable: false
     path: superset/prod
-  # Instalamos igual como está em homologação
-  keda: {}
-  # Vamos desabilitar por hora visto que não foi implementado em homolog ainda
-  kube-prometheus-stack:
-    disable: true
-  # Já vêm instalado em produção
-  ingress-nginx:
-    disable: true
-  cert-manager:
-    disable: true
-  # Não necessário em produção
-  longhorn:
-    disable: true
+
   minio:
-    name: minio
-    namespace: minio
-    disable: false
     path: minio/prod
-    helm: true
+
+  postgres:
+    disable: true
