@@ -4,7 +4,6 @@ on:
   push:
     branches:
         - main
-        - feat/superset-embed
     paths:
       - 'embed-superset/docker/Dockerfile'
       - 'embed-superset/docker/main.py'
