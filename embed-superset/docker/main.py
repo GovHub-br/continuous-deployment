@@ -1,15 +1,22 @@
 import os
 import httpx
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-# Config via env
 SUP_URL      = os.getenv("SUP_URL", "https://superset.lappis.ipea.gov.br").rstrip("/")
 SUP_USERNAME = os.getenv("SUP_USERNAME", "admin")
 SUP_PASSWORD = os.getenv("SUP_PASSWORD", "")
 VERIFY_TLS   = os.getenv("VERIFY_TLS", "true").lower() not in ("0", "false", "no")
 
 app = FastAPI(title="Superset Guest Token Issuer (mini, no-default)")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_credentials=False,
+)
 
 class TokenOut(BaseModel):
     token: str
@@ -37,7 +44,7 @@ async def _csrf(client: httpx.AsyncClient, access_token: str) -> str:
     csrf = r.json().get("result")
     if not csrf:
         raise HTTPException(502, "csrf_token ausente")
-    return csrf  # cookies ficam no client
+    return csrf
 
 async def _guest_token(client: httpx.AsyncClient, access_token: str, csrf: str, dash_uuid: str, username="viewer-app") -> str:
     r = await client.post(
@@ -48,9 +55,11 @@ async def _guest_token(client: httpx.AsyncClient, access_token: str, csrf: str, 
             "Referer": SUP_URL,
             "Content-Type": "application/json",
         },
-        json={"resources": [{"type": "dashboard", "id": dash_uuid}],
-              "rls": [],
-              "user": {"username": username}},
+        json={
+            "resources": [{"type": "dashboard", "id": dash_uuid}],
+            "rls": [],
+            "user": {"username": username},
+        },
     )
     if r.status_code != 200:
         raise HTTPException(502, f"guest_token falhou: {r.text}")
@@ -66,8 +75,8 @@ async def guest_token(
 ):
     async with httpx.AsyncClient(verify=VERIFY_TLS, timeout=20.0) as client:
         access = await _login(client)
-        csrf   = await _csrf(client, access)
-        token  = await _guest_token(client, access, csrf, dash, username=username)
+        csrf = await _csrf(client, access)
+        token = await _guest_token(client, access, csrf, dash, username=username)
         return {"token": token}
 
 @app.get("/health")
