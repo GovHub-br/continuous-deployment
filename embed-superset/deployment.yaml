@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embed-superset
+  namespace: superset
+  labels:
+    app: embed-superset
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: embed-superset
+  template:
+    metadata:
+      labels:
+        app: embed-superset
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/govhub-br/embed-superset:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: SUP_URL
+              value: "https://superset.lappis.ipea.gov.br"
+            - name: VERIFY_TLS
+              value: "false"
+            - name: SUP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: embed-superset-credentials
+                  key: SUP_USERNAME
+            - name: SUP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: embed-superset-credentials
+                  key: SUP_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
