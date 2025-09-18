@@ -13,7 +13,6 @@ helmCharts:
         enabled: true
         ingressClassName: "nginx"
         annotations:
-          cert-manager.io/issuer: "superset-ui"
           acme.cert-manager.io/http01-edit-in-place: "true"
           nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
           nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
@@ -23,6 +22,6 @@ helmCharts:
         hosts:
           - "superset.lappis.ipea.gov.br"
         tls:
-          - secretName: ingress-superset-ui
+          - secretName: lappis-tls-certificate
             hosts:
               - "superset.lappis.ipea.gov.br"
