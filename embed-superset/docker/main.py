@@ -69,7 +69,7 @@ async def _guest_token(client: httpx.AsyncClient, access_token: str, csrf: str, 
     return tok
 
 @app.get("/guest-token", response_model=TokenOut)
-@app.get("/embedded/guest-token", response_model=TokenOut)
+@app.get("/embed/guest-token", response_model=TokenOut)
 async def guest_token(
     dash: str = Query(..., description="UUID do dashboard (obrigatório)"),
     username: str = Query("viewer-app", description="Nome lógico do usuário no token"),
