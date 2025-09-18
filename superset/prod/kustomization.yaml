@@ -17,6 +17,8 @@ helmCharts:
           nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
           nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
           nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+          kubernetes.io/ingress.class: nginx
+          cert-manager.io/cluster-issuer: letsencrypt-prod
         path: "/"
         pathType: ImplementationSpecific
         hosts:
