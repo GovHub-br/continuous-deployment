@@ -22,7 +22,6 @@ extraEnvRaw:
         key: SUPERSET_SECRET_KEY
 
 configOverrides:
-  # 1) FEATURE FLAGS (nome do arquivo importa — melhor usar .py)
   feature_flags.py: |
     FEATURE_FLAGS = {
       "ENABLE_TEMPLATE_PROCESSING": True,
@@ -33,32 +32,23 @@ configOverrides:
     AUTH_ROLE_PUBLIC = "Public"
     PUBLIC_ROLE_LIKE = "Gamma"
 
-  # 2) Embed via Guest Token + CSP do iframe + papel público
   10-embed_guest.py: |
-    # --- Guest Token (SDK) ---
     ENABLE_GUEST_TOKEN = True
-    GUEST_ROLE_NAME = "Embed"           # papel do convidado (configure permissões no UI)
+    GUEST_ROLE_NAME = "Embed"
     GUEST_TOKEN_JWT_ALGO = "HS256"
-    # Ex.: deixar o token durar mais (opcional)
-    # GUEST_TOKEN_JWT_EXP_SECONDS = 43200  # 12h
 
-    # --- Acesso anônimo à CASCA do embed (GET /embedded/...) ---
-    # O primeiro GET do iframe é anônimo → usa o papel "Public"
     AUTH_ROLE_PUBLIC = "Public"
 
-    # --- iFrame / CSP (Talisman) ---
     ALLOW_IFRAME_EMBED = True
     TALISMAN_ENABLED = True
     TALISMAN_CONFIG = {
       "content_security_policy": {
-        # domínios autorizados a "hospedar" o iframe
         "frame-ancestors": ["'self'", "https://*.lappis.ipea.gov.br", "http://localhost:8000"],
       },
-      # evita X-Frame-Options conflitando com frame-ancestors
       "frame_options": None,
     }
 
-envFromSecret: custom-superset-env    # mantém seu secret existente
+envFromSecret: custom-superset-env
 secretEnv:
   create: false
 
