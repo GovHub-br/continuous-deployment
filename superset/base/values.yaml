@@ -30,7 +30,7 @@ configOverrides:
 
   00-public.py: |
     AUTH_ROLE_PUBLIC = "Public"
-    PUBLIC_ROLE_LIKE = "Gamma"
+    PUBLIC_ROLE_LIKE = "Public"
 
   10-embed_guest.py: |
     ENABLE_GUEST_TOKEN = True
@@ -43,7 +43,12 @@ configOverrides:
     TALISMAN_ENABLED = True
     TALISMAN_CONFIG = {
       "content_security_policy": {
-        "frame-ancestors": ["'self'", "https://*.lappis.ipea.gov.br", "http://localhost:8000"],
+      "frame-ancestors": [
+        "'self'",
+        "https://*.lappis.ipea.gov.br",
+        "https://*.ipea.gov.br",
+        "https://ipea.gov.br"
+      ],
       },
       "frame_options": None,
     }
