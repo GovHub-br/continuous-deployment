@@ -293,7 +293,7 @@ dags:
     existingClaim: airflow-dags-data
   gitSync:
     enabled: true
-    repo: https://gitlab.com/lappis-unb/gest-odadosipea/app-lappis-ipea
+    repo: https://github.com/GovHub-br/data-application-gov-hub
     depth: 2
     # the number of consecutive failures allowed before aborting
     maxFailures: 0
