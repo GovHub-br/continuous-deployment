@@ -1,6 +1,6 @@
 useStandardNaming: true
 
-defaultAirflowRepository: registry.gitlab.com/lappis-unb/gest-odadosipea/app-lappis-ipea/airflow-ipea
+defaultAirflowRepository: ghcr.io/govhub-br/airflow-ipea
 defaultAirflowTag: "latest"
 airflowVersion: "2.8.1"
 
