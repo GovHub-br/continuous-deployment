@@ -302,3 +302,62 @@ dags:
     subPath: "airflow_lappis/dags"
     # Git credentials
     credentialsSecret: airflow-git-credentials
+
+statsd:
+  enabled: true
+
+  overrideMappings:
+    - match: "airflow.ti.finish.*.*.*"
+      name: "airflow_ti_finish_total"
+      labels:
+        dag_id: "$1"
+        task_id: "$2"
+        state: "$3"
+
+    - match: "airflow.ti.start.*.*"
+      name: "airflow_ti_start_total"
+      labels:
+        dag_id: "$1"
+        task_id: "$2"
+
+    - match: "airflow.task.cpu_usage.*.*"
+      name: "airflow_task_cpu_usage_percent"
+      labels:
+        dag_id: "$1"
+        task_id: "$2"
+
+    - match: "airflow.task.mem_usage.*.*"
+      name: "airflow_task_mem_usage_percent"
+      labels:
+        dag_id: "$1"
+        task_id: "$2"
+
+    - match: '^airflow\.task\.mem_peak_mb\.(?P<dag_id>[^.]+)\.(?P<task_id>[^.]+)\.(?P<run_id>[^.]+)$'
+      match_type: regex
+      name: airflow_task_mem_peak_mb
+      labels:
+        dag_id: "$dag_id"
+        task_id: "$task_id"
+        run_id: "$run_id"
+
+    - match: '^airflow\.task\.mem_peak_mb\.(?P<dag_id>[^.]+)\.(?P<task_id>[^.]+)$'
+      match_type: regex
+      name: airflow_task_mem_peak_mb
+      labels:
+        dag_id: "$dag_id"
+        task_id: "$task_id"
+
+    - match: '^airflow\.task\.cpu_pct\.(?P<dag_id>[^.]+)\.(?P<task_id>[^.]+)\.(?P<run_id>[^.]+)$'
+      match_type: regex
+      name: airflow_task_cpu_pct
+      labels:
+        dag_id: "$dag_id"
+        task_id: "$task_id"
+        run_id: "$run_id"
+
+    - match: '^airflow\.task\.cpu_pct\.(?P<dag_id>[^.]+)\.(?P<task_id>[^.]+)$'
+      match_type: regex
+      name: airflow_task_cpu_pct
+      labels:
+        dag_id: "$dag_id"
+        task_id: "$task_id"
