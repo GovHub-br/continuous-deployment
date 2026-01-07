@@ -1,0 +1,21 @@
+service:
+  type: ClusterIP
+
+  nfsPort: 2049
+  nlockmgrPort: 32803
+  mountdPort: 20048
+  rquotadPort: 875
+  rpcbindPort: 111
+  statdPort: 662
+
+persistence:
+  enabled: true
+
+  accessMode: ReadWriteOnce
+  size: 200Gi
+
+storageClass:
+  create: true
+  defaultClass: true
+  name: ganesha
+  provisionerName: nfs-provisioner
